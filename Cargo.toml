@@ -1,0 +1,63 @@
+[package]
+name = "quickcodes"
+version = "0.1.0"
+edition = "2021"
+authors = ["QuickCodes Contributors"]
+description = "Universal Barcode & QR Toolkit - Generate and read 1D and 2D codes"
+license = "MIT"
+repository = "https://github.com/seu-usuario/quickcodes"
+homepage = "https://github.com/seu-usuario/quickcodes"
+documentation = "https://docs.rs/quickcodes"
+keywords = ["barcode", "qrcode", "ean", "code128", "datamatrix"]
+categories = ["encoding", "multimedia::images"]
+readme = "README.md"
+
+[lib]
+name = "quickcodes"
+crate-type = ["cdylib", "rlib"]
+
+# CLI will be added in Phase 1
+# [[bin]]
+# name = "quickcodes-cli"
+# path = "src/bin/cli.rs"
+
+[dependencies]
+# Error handling
+thiserror = "2.0"
+anyhow = "1.0"
+
+# Image processing and generation
+image = { version = "0.25", optional = true }
+resvg = { version = "0.44", optional = true }
+usvg = { version = "0.44", optional = true }
+
+# QR Code generation
+qrcode = "0.14"
+
+# SVG generation
+svg = "0.18"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# CLI (for future CLI tool)
+clap = { version = "4.5", features = ["derive"], optional = true }
+
+# Python bindings (optional)
+pyo3 = { version = "0.23", features = ["extension-module"], optional = true }
+
+[features]
+default = ["png", "svg"]
+png = ["dep:image"]
+svg = ["dep:resvg", "dep:usvg"]
+cli = ["dep:clap"]
+python = ["dep:pyo3"]
+
+[dev-dependencies]
+criterion = "0.5"
+
+# Benchmarks will be added later
+# [[bench]]
+# name = "generation_benchmark"
+# harness = false

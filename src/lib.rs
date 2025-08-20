@@ -1,0 +1,125 @@
+//! # QuickCodes
+//!
+//! Universal Barcode & QR Toolkit for generating and reading 1D and 2D codes.
+//!
+//! ## Features
+//!
+//! - Generate and read multiple barcode formats (EAN-13, UPC-A, Code128, QR Code)
+//! - Export to PNG, SVG formats
+//! - High performance Rust core
+//! - Cross-platform support
+//!
+//! ## Quick Start
+//!
+//! ```rust
+//! use quickcodes::{generate, BarcodeType, ExportFormat};
+//!
+//! // Generate a QR Code
+//! let qr_svg = generate(BarcodeType::QRCode, "Hello, World!", ExportFormat::SVG)?;
+//!
+//! // Generate an EAN-13 barcode
+//! let ean_png = generate(BarcodeType::EAN13, "1234567890123", ExportFormat::PNG)?;
+//! ```
+
+pub mod types;
+pub mod generators;
+pub mod exporters;
+pub mod readers;
+
+// Re-export public API
+pub use types::*;
+pub use generators::*;
+pub use exporters::*;
+
+use anyhow::Result as AnyhowResult;
+
+/// Main generation function - unified API for all barcode types
+///
+/// # Arguments
+///
+/// * `barcode_type` - The type of barcode to generate
+/// * `data` - The data to encode
+/// * `format` - The output format (PNG, SVG)
+///
+/// # Returns
+///
+/// Returns the generated barcode as bytes in the specified format
+///
+/// # Examples
+///
+/// ```rust
+/// use quickcodes::{generate, BarcodeType, ExportFormat};
+///
+/// // Generate QR Code as SVG
+/// let svg_data = generate(BarcodeType::QRCode, "https://example.com", ExportFormat::SVG)?;
+///
+/// // Generate EAN-13 as PNG
+/// let png_data = generate(BarcodeType::EAN13, "1234567890123", ExportFormat::PNG)?;
+/// ```
+pub fn generate(
+    barcode_type: BarcodeType,
+    data: &str,
+    format: ExportFormat,
+) -> AnyhowResult<Vec<u8>> {
+    let barcode = match barcode_type {
+        BarcodeType::QRCode => generators::qr::generate_qr(data)?,
+        BarcodeType::EAN13 => generators::ean13::generate_ean13(data)?,
+        BarcodeType::UPCA => generators::upc::generate_upc_a(data)?,
+        BarcodeType::Code128 => generators::code128::generate_code128(data)?,
+        _ => return Err(anyhow::anyhow!("Barcode type not yet implemented")),
+    };
+
+    match format {
+        ExportFormat::SVG => Ok(exporters::svg::export_svg(&barcode)?),
+        ExportFormat::PNG => Ok(exporters::png::export_png(&barcode)?),
+        ExportFormat::PDF => Err(anyhow::anyhow!("PDF export not yet implemented - coming in Phase 2")),
+    }
+}
+
+/// Generate and save barcode to file
+///
+/// # Arguments
+///
+/// * `barcode_type` - The type of barcode to generate
+/// * `data` - The data to encode
+/// * `output_path` - Path where to save the file
+///
+/// # Examples
+///
+/// ```rust
+/// use quickcodes::{generate_to_file, BarcodeType};
+///
+/// // Generate QR Code and save as SVG
+/// generate_to_file(BarcodeType::QRCode, "Hello", "output.svg")?;
+///
+/// // Generate EAN-13 and save as PNG
+/// generate_to_file(BarcodeType::EAN13, "1234567890123", "barcode.png")?;
+/// ```
+pub fn generate_to_file(
+    barcode_type: BarcodeType,
+    data: &str,
+    output_path: &str,
+) -> AnyhowResult<()> {
+    let format = ExportFormat::from_extension(output_path)?;
+    let barcode_data = generate(barcode_type, data, format)?;
+    
+    std::fs::write(output_path, barcode_data)?;
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_qr_generation() {
+        let result = generate(BarcodeType::QRCode, "test", ExportFormat::SVG);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_invalid_barcode_type() {
+        let result = generate(BarcodeType::DataMatrix, "test", ExportFormat::SVG);
+        assert!(result.is_err());
+    }
+}

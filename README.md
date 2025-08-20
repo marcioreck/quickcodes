@@ -48,16 +48,96 @@ let result = await read(videoStream);
 console.log(result);
 ```
 
+### 📸 Exemplos Gerados
+
+Após executar `cargo run --example basic_usage`, você encontrará estes arquivos em `examples/output/`:
+
+- **qr_hello.svg** - QR Code: "Hello, QuickCodes!"
+- **ean13_example.png** - EAN-13: 1234567890128
+- **upc_a_example.svg** - UPC-A: 036000291452  
+- **code128_example.svg** - Code128: "HELLO123"
+- **pix_payment.svg** - QR Code para pagamento Pix
+- **github_url.png** - QR Code com URL do GitHub
+
+---
+
+## 🎯 Status Atual
+
+✅ **MVP Funcional Completo!**
+
+- ✅ 4 formatos de código implementados (QR, EAN-13, UPC-A, Code128)
+- ✅ 2 formatos de exportação (SVG, PNG)
+- ✅ 25 testes unitários passando
+- ✅ API unificada e fácil de usar
+- ✅ Exemplos funcionais com arquivos reais gerados
+
+```bash
+# Teste a biblioteca agora:
+git clone <repo>
+cd quickcodes
+cargo run --example basic_usage
+# Veja os códigos gerados em examples/output/
+```
+
 ---
 
 ## 📌 Roadmap
 
-* [x] Núcleo em Rust
-* [x] Bindings para Python e Node.js
-* [ ] Suporte a DataMatrix, PDF417 e Aztec
-* [ ] Exportação para PDF nativo
-* [ ] Bindings para Go e .NET
-* [ ] API REST em Docker
+### 🚀 **Fase 1 - MVP (Núcleo Funcional)** ✅ CONCLUÍDA
+* [x] **Configuração do Projeto Rust**
+  * [x] Estrutura modular do projeto
+  * [x] Sistema de build e testes (25 testes unitários passando)
+  * [x] Documentação automática (docs.rs ready)
+* [x] **Geradores de Código 1D**
+  * [x] Code128 (implementação básica)
+  * [x] EAN-13 com checksum automático
+  * [x] UPC-A
+* [x] **Geradores de Código 2D**
+  * [x] QR Code (Low, Medium, Quartile, High error correction)
+* [x] **Sistema de Exportação**
+  * [x] SVG (vetorial, escalável)
+  * [x] PNG (raster, alta qualidade)
+  * [x] Configurações de tamanho e DPI
+* [ ] **Bindings Iniciais**
+  * [ ] Python (PyO3)
+  * [ ] JavaScript/Node.js (NAPI-RS)
+
+### 🔧 **Fase 2 - Expansão Industrial**
+* [ ] **Códigos 2D Avançados**
+  * [ ] DataMatrix (farmacêutica/ANVISA)
+  * [ ] PDF417 (documentos oficiais)
+  * [ ] Aztec Code (transporte)
+* [ ] **Leitura/Decodificação**
+  * [ ] Leitor de imagens estáticas
+  * [ ] Algoritmos de detecção e correção
+  * [ ] Suporte a múltiplos códigos por imagem
+* [ ] **Exportação Avançada**
+  * [ ] PDF nativo
+  * [ ] Canvas/HTML5 integration
+  * [ ] Batch processing
+* [ ] **WebAssembly**
+  * [ ] Build WASM otimizado
+  * [ ] API JavaScript para browser
+  * [ ] Leitura de webcam em tempo real
+
+### 🌐 **Fase 3 - Ecossistema Completo**
+* [ ] **Bindings Adicionais**
+  * [ ] Go (CGO)
+  * [ ] .NET (P/Invoke)
+  * [ ] C/C++ headers
+* [ ] **Formatos de Legado**
+  * [ ] Code39
+  * [ ] ITF-14
+  * [ ] Codabar
+* [ ] **Ferramentas e Utilitários**
+  * [ ] CLI tool (`quickcodes generate`, `quickcodes read`)
+  * [ ] API REST em Docker
+  * [ ] Benchmarks e performance tests
+* [ ] **Recursos Avançados**
+  * [ ] Sistema de plugins
+  * [ ] Configurações avançadas de renderização
+  * [ ] Suporte a fontes customizadas
+  * [ ] Watermarks e branding
 
 ---
 
