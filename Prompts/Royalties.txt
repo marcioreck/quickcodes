@@ -1,0 +1,74 @@
+Agora, responda se existe algum problema de licença de uso dos padroẽs de códigos 1D e 2D existentes, se é preciso pagar royalties ou taxas semelhantes de propriedade intelectual.
+
+Agora sobre a parte **legal/licenciamento** dos **padrões de códigos de barras e QR codes**:
+
+---
+
+# 🔹 Patentes e Royalties nos Padrões de Código de Barras
+
+### ✅ **EAN, UPC, Code128, Code39, ITF-14, Codabar (1D)**
+
+* Esses padrões foram criados pela **GS1** (organização internacional responsável pelo sistema de código de barras).
+* O **uso do padrão é livre** → qualquer software pode **gerar e ler** esses códigos sem royalties.
+* O que pode envolver custo é a **atribuição de números oficiais (GS1 Company Prefix)** para empresas que desejam registrar **códigos de barras válidos no varejo**.
+
+  * Exemplo: para vender no supermercado, a empresa paga anuidade para a GS1.
+* Para você como desenvolvedor → **não há royalties** em implementar ou distribuir uma lib que gera/lê esses formatos.
+
+---
+
+### ✅ **QR Code**
+
+* Criado pela Denso Wave (Japão, anos 90).
+* A empresa **depositou patentes**, mas em 1999 declarou que o uso seria **livre de royalties** → ou seja, é um **padrão aberto**.
+* Você pode gerar e ler QR Codes sem pagar nada.
+* Só existem **restrições em marcas registradas**:
+
+  * O termo **“QR Code”** é marca registrada da Denso Wave em alguns países.
+  * Na prática, quase todas as libs usam “QR Code” sem problemas, desde que não se apresente como “oficial” da Denso.
+
+---
+
+### ✅ **DataMatrix**
+
+* Foi padronizado pela **ISO/IEC 16022**.
+* Livre de royalties, qualquer software pode implementar.
+* Usado amplamente na indústria farmacêutica e eletrônica.
+
+---
+
+### ✅ **PDF417**
+
+* Padrão **ISO/IEC 15438**.
+* Também livre de royalties.
+* Muito usado em documentos oficiais.
+
+---
+
+### ✅ **Aztec Code**
+
+* Padrão **ISO/IEC 24778**.
+* Também é **royalty-free**.
+* Muito usado em bilhetes de transporte (aéreo/ferroviário).
+
+---
+
+# 🔴 Onde podem existir custos
+
+* **Não no software em si** → gerar e ler é sempre livre.
+* O custo existe quando uma **empresa quer códigos oficiais e registrados** para o comércio (EAN/UPC pela GS1).
+* Exemplo: uma padaria pode imprimir QR codes de Pix sem custo → mas se quiser vender biscoitos embalados em supermercado com **EAN oficial**, precisa pagar à GS1.
+
+---
+
+# 📌 Resposta curta
+
+* **QuickCodes não terá nenhum problema legal.**
+* Todos os padrões (1D e 2D) são **abertos e livres de royalties** para uso em software.
+* A única exceção é a **marca “QR Code”** (registrada pela Denso Wave), mas isso não impede você de usar o termo descritivamente no projeto.
+
+---
+
+👉 Ou seja: você pode lançar o **QuickCodes** no GitHub, implementar todos os formatos, e não deve pagar nada em termos de patentes/licenciamento.
+
+---

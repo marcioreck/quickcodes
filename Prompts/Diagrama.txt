@@ -1,0 +1,95 @@
+Show 👌 então aqui vai uma visão de **arquitetura modular** para a biblioteca, com o núcleo em **Rust** e bindings para várias linguagens:
+
+---
+
+# 📌 Arquitetura – Biblioteca Universal de Códigos de Barras
+
+```
++-----------------------------------------------------------+
+|                  Camadas de Aplicação                     |
+|-----------------------------------------------------------|
+|  Python API   |   Node.js / WASM API   |   Go/.NET (futuro)|
+|   (PyO3)      |   (wasm-bindgen)       |   (FFI wrappers)  |
++-----------------------------------------------------------+
+
++-----------------------------------------------------------+
+|                  Núcleo da Biblioteca (Rust)              |
+|-----------------------------------------------------------|
+|   Módulo Geração        |   Módulo Leitura                |
+|-------------------------|---------------------------------|
+| - EAN-13                | - EAN-13                       |
+| - UPC-A                 | - UPC-A                        |
+| - Code128               | - Code128                      |
+| - QR Code               | - QR Code                      |
+| - DataMatrix (fase 2)   | - DataMatrix                   |
+| - PDF417 (fase 2)       | - PDF417                       |
+| - Aztec (fase 2)        | - Aztec                        |
+| - Code39, ITF-14        | - Code39, ITF-14 (fase 3)      |
+|-------------------------|---------------------------------|
+|  Saída: PNG, SVG, PDF   | Entrada: Imagem, Câmera (WASM) |
++-----------------------------------------------------------+
+
++-----------------------------------------------------------+
+|                  Utilitários Comuns                       |
+|-----------------------------------------------------------|
+| - Renderização gráfica (SVG, Canvas, PDF)                 |
+| - Algoritmos de checksum (EAN, UPC)                       |
+| - Otimização de performance (SIMD, threads)               |
+| - Interface plugin para novos formatos                    |
++-----------------------------------------------------------+
+```
+
+---
+
+## 🔹 **Fluxo de Uso**
+
+1. O usuário escolhe linguagem (Python, JS, etc).
+2. A chamada vai para um **wrapper/binding**.
+3. Esse binding invoca o **núcleo Rust** via FFI (Foreign Function Interface).
+4. O núcleo:
+
+   * Se for **geração** → cria a imagem (SVG/PNG/PDF).
+   * Se for **leitura** → processa a imagem (ou câmera, via WASM) e retorna os dados decodificados.
+
+---
+
+## 🔹 **Benefícios dessa arquitetura**
+
+* **Rust no core** → segurança, performance, multiplataforma.
+* **Bindings leves** → permite usar em Python, Node.js, até Go e .NET no futuro.
+* **WebAssembly** → leitura e geração no navegador, sem depender de servidor.
+* **Extensibilidade** → novos padrões podem ser adicionados sem quebrar APIs.
+
+---
+
+👉 Exemplo de API em Python:
+
+```python
+from barcodegen import generate, read
+
+# Gerar QR Code
+generate("QR", "pix:123456", output="pix.svg")
+
+# Ler um código de barras de imagem
+data = read("foto_produto.png")
+print(data)  # -> "7891234567890"
+```
+
+👉 Exemplo em JS (browser com WASM):
+
+```javascript
+import { generate, read } from "barcodegen-wasm";
+
+// Gerar um EAN-13
+let svg = generate("EAN13", "7891234567890");
+
+// Ler de uma webcam
+let result = await read(videoStream);
+console.log(result);
+```
+
+---
+
+💡 Esse tipo de arquitetura modular é o que faz libs como **Tesseract (OCR)** ou **ZXing** serem referência global → **core rápido + bindings para todo lado**.
+
+---

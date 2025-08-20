@@ -1,0 +1,68 @@
+Encontro vários sites que oferecem a criação de códigos de barras. Qual é a "questão" deles? Estão em busca de alguma monetização? Eles interferem de alguma forma no nosso plano de fazer uma lib de códigos que seja famosa e muito usada no github?
+
+Excelente ponto 👌 você notou algo importante:
+existem dezenas de **sites geradores de código de barras/QR code**, mas a "questão" deles é bem diferente de uma **biblioteca open source famosa no GitHub**.
+
+---
+
+# 📌 Por que existem tantos sites de geração de código de barras?
+
+1. **Monetização direta**
+
+   * Muitos colocam anúncios (AdSense, banners).
+   * Outros vendem PDFs prontos em alta resolução ou cobram por **lotes** de códigos.
+   * Alguns vendem **planos premium** para geração em massa ou integração via API.
+
+2. **Captação de Leads**
+
+   * Usuários usam o gerador e, ao baixar, são convidados a **cadastrar e-mail** → depois recebem propaganda de softwares pagos (ex.: ERP, sistemas de estoque).
+
+3. **Serviço para leigos**
+
+   * O público desses sites geralmente é **não técnico** (lojas pequenas, gráficas, professores, designers).
+   * Eles não querem programar → só precisam de uma imagem pronta.
+
+---
+
+# 📌 O que esses sites **não** entregam
+
+* **Integração em software** → quase nenhum fornece uma boa **API gratuita** para desenvolvedores.
+* **Leitura (decodificação)** → a maioria só gera, não lê.
+* **Cobertura completa de padrões industriais** → a maioria só oferece EAN/UPC e QR.
+* **Open source** → código fechado, dependente do site/servidor.
+
+---
+
+# 📌 Efeito no seu plano (lib open source)
+
+✅ **Eles não atrapalham.** Pelo contrário, até reforçam a necessidade:
+
+* Esses sites resolvem problemas **pontuais de usuários finais**.
+* A sua biblioteca resolve problemas **de desenvolvedores e empresas** → quem precisa **automatizar geração/leitura dentro de um software**, não ficar exportando manualmente em PNG.
+
+👉 Exemplo:
+
+* Um site gera um QR Code de Pix para um restaurante.
+* Mas o dono de um sistema de delivery precisa gerar **milhares de QRs dinamicamente** → aí entra sua biblioteca.
+
+---
+
+# 📌 Monetização indireta (oportunidade futura)
+
+Mesmo sendo **open source no GitHub**, você pode:
+
+1. **Criar uma API SaaS** (ex.: `/generate?type=ean13&data=12345`).
+2. **Vender suporte/consultoria** para empresas que precisem integrar em escala.
+3. **Oferecer SDK premium** com features avançadas (lotes, compressão, marca d’água, relatórios).
+
+Isso é o que **ZXing** nunca fez direito → abriria espaço para o seu projeto se destacar.
+
+---
+
+# 📌 Resposta direta à sua dúvida
+
+* Sim, esses sites buscam **monetização via anúncios, planos pagos ou captação de clientes**.
+* Não, eles **não interferem** no seu plano → são públicos diferentes.
+* Sua biblioteca tem **potencial de ser famosa** porque atende **desenvolvedores e empresas**, não usuários casuais que só querem “um código pronto para imprimir”.
+
+---

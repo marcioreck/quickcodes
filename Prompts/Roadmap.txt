@@ -1,0 +1,97 @@
+Boa 🚀
+Então vamos estruturar um **roadmap de desenvolvimento e divulgação** para essa biblioteca open source de geração e leitura de códigos de barras e QR Codes.
+
+---
+
+# 📌 Roadmap – Biblioteca de Códigos de Barras e QR Codes
+
+## **Fase 1 – Núcleo (MVP)**
+
+🎯 Objetivo: entregar rápido algo útil e simples.
+
+* **Funcionalidades:**
+
+  * Geração de **EAN-13**, **UPC-A**, **Code128**, **QR Code**.
+  * Exportação em **PNG e SVG**.
+  * API simples e consistente:
+
+    ```python
+    from barcodegen import generate
+
+    generate("EAN13", "7891234567890", output="produto.svg")
+    ```
+  * Leitura básica a partir de **imagens**.
+
+* **Stack recomendada:**
+
+  * Core em **Rust** (rápido, cross-platform, fácil de portar).
+  * Bindings para **Python** e **JavaScript (Node.js/WebAssembly)**.
+
+---
+
+## **Fase 2 – Expansão**
+
+🎯 Objetivo: cobrir padrões críticos em indústria, saúde e transporte.
+
+* Adicionar suporte a:
+
+  * **DataMatrix** (obrigatório em medicamentos 🇧🇷 pela ANVISA).
+  * **PDF417** (documentos, CNH digital).
+  * **Aztec** (cartões de embarque).
+* Suporte a **Canvas/HTML5** e **PDF direto**.
+* **Leitura em tempo real de câmera** (via WebAssembly + WebRTC no navegador, bindings nativos em Python).
+
+---
+
+## **Fase 3 – Consolidação**
+
+🎯 Objetivo: se diferenciar das libs antigas.
+
+* Adicionar simbologias de legado/nicho: **Code39, ITF-14, Codabar**.
+* Otimizações de performance (ex.: multithreading na leitura de câmera).
+* **Extensibilidade:** permitir plugin de novos formatos pelo usuário.
+* Testes automáticos com **conjuntos de imagens reais** (GS1, ANVISA, IATA).
+
+---
+
+# 📌 Estratégia para Popularidade no GitHub
+
+## **1. Branding**
+
+* Nome curto e direto (ex.: `barcodegen`, `universal-barcode`, `qrbars`).
+* Logo minimalista.
+* Readme com GIFs mostrando geração/leitura em tempo real.
+
+## **2. Conteúdo**
+
+* **Exemplos práticos**:
+
+  * Gerar QR do **Pix**.
+  * Gerar EAN-13 para produto fictício.
+  * Ler código de barras de um bilhete de avião.
+* Tutoriais no README e em Jupyter Notebook.
+
+## **3. Comunidade**
+
+* Issues e discussions abertas desde o início.
+* Labels fáceis: `good first issue`, `help wanted`.
+* Documentação clara com cheatsheet dos formatos suportados.
+
+## **4. Divulgação**
+
+* Lançar no **Reddit** (`r/programming`, `r/rust`, `r/python`, `r/javascript`).
+* Publicar no **Hacker News**.
+* Escrever posts no **Dev.to** e **Medium** explicando os bastidores.
+* Integrar exemplos em **Streamlit**/**Next.js** para mostrar ao vivo.
+
+## **5. Crescimento**
+
+* Criar bindings para **Go** e **.NET** conforme houver demanda.
+* Implementar **API REST** em Docker para quem só quiser usar via HTTP.
+* Se a comunidade crescer → criar **org no GitHub** para o projeto.
+
+---
+
+👉 Em **1 ano**, se seguir esse plano, você pode ter uma lib que vire padrão em muitos projetos, especialmente se entregar **performance + cobertura ampla de formatos**.
+
+---
