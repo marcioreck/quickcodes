@@ -55,7 +55,7 @@ cli = ["dep:clap"]
 python = ["dep:pyo3"]
 
 [dev-dependencies]
-criterion = "0.5"
+criterion = "0.7"
 tempfile = "3.8"
 
 # Benchmarks will be added later
