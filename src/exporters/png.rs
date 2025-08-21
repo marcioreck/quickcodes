@@ -1,10 +1,14 @@
 //! PNG export functionality
 
+#[cfg(feature = "png")]
 use crate::types::{Barcode, BarcodeModules, QuickCodesError, Result};
+#[cfg(feature = "png")]
 use image::{ImageBuffer, Rgb, RgbImage};
+#[cfg(feature = "png")]
 use std::io::Cursor;
 
 /// Export a barcode to PNG format
+#[cfg(feature = "png")]
 pub fn export_png(barcode: &Barcode) -> Result<Vec<u8>> {
     match &barcode.modules {
         BarcodeModules::Linear(pattern) => export_linear_png(barcode, pattern),
@@ -13,6 +17,7 @@ pub fn export_png(barcode: &Barcode) -> Result<Vec<u8>> {
 }
 
 /// Export a linear (1D) barcode to PNG
+#[cfg(feature = "png")]
 fn export_linear_png(barcode: &Barcode, pattern: &[bool]) -> Result<Vec<u8>> {
     let module_width = 2u32; // Width of each module in pixels
     let height = 60u32; // Height of the barcode
@@ -56,6 +61,7 @@ fn export_linear_png(barcode: &Barcode, pattern: &[bool]) -> Result<Vec<u8>> {
 }
 
 /// Export a matrix (2D) barcode to PNG
+#[cfg(feature = "png")]
 fn export_matrix_png(barcode: &Barcode, matrix: &[Vec<bool>]) -> Result<Vec<u8>> {
     if matrix.is_empty() || matrix[0].is_empty() {
         return Err(QuickCodesError::ExportError("Matrix is empty".to_string()));
@@ -106,7 +112,7 @@ fn export_matrix_png(barcode: &Barcode, matrix: &[Vec<bool>]) -> Result<Vec<u8>>
     Ok(buffer)
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "png"))]
 mod tests {
     use super::*;
     use crate::generators::ean13::generate_ean13;

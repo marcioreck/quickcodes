@@ -1,10 +1,14 @@
 //! SVG export functionality
 
+#[cfg(feature = "svg")]
 use crate::types::{Barcode, BarcodeModules, BarcodeType, QuickCodesError, Result};
+#[cfg(feature = "svg")]
 use svg::node::element::{Rectangle, Text};
+#[cfg(feature = "svg")]
 use svg::Document;
 
 /// Export a barcode to SVG format
+#[cfg(feature = "svg")]
 pub fn export_svg(barcode: &Barcode) -> Result<Vec<u8>> {
     match &barcode.modules {
         BarcodeModules::Linear(pattern) => export_linear_svg(barcode, pattern),
@@ -13,6 +17,7 @@ pub fn export_svg(barcode: &Barcode) -> Result<Vec<u8>> {
 }
 
 /// Export a linear (1D) barcode to SVG
+#[cfg(feature = "svg")]
 fn export_linear_svg(barcode: &Barcode, pattern: &[bool]) -> Result<Vec<u8>> {
     let module_width = 2.0; // Width of each module in SVG units
     let height = 60.0; // Height of the barcode
@@ -75,6 +80,7 @@ fn export_linear_svg(barcode: &Barcode, pattern: &[bool]) -> Result<Vec<u8>> {
 }
 
 /// Export a matrix (2D) barcode to SVG
+#[cfg(feature = "svg")]
 fn export_matrix_svg(barcode: &Barcode, matrix: &[Vec<bool>]) -> Result<Vec<u8>> {
     if matrix.is_empty() || matrix[0].is_empty() {
         return Err(QuickCodesError::ExportError("Matrix is empty".to_string()));
@@ -156,7 +162,7 @@ fn export_matrix_svg(barcode: &Barcode, matrix: &[Vec<bool>]) -> Result<Vec<u8>>
     Ok(svg_string.into_bytes())
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "svg"))]
 mod tests {
     use super::*;
     use crate::generators::ean13::generate_ean13;

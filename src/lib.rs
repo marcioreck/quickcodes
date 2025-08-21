@@ -81,8 +81,18 @@ pub fn generate(
     };
 
     match format {
+        #[cfg(feature = "svg")]
         ExportFormat::SVG => Ok(exporters::svg::export_svg(&barcode)?),
+        #[cfg(not(feature = "svg"))]
+        ExportFormat::SVG => Err(anyhow::anyhow!(
+            "SVG export not available - enable the 'svg' feature"
+        )),
+        #[cfg(feature = "png")]
         ExportFormat::PNG => Ok(exporters::png::export_png(&barcode)?),
+        #[cfg(not(feature = "png"))]
+        ExportFormat::PNG => Err(anyhow::anyhow!(
+            "PNG export not available - enable the 'png' feature"
+        )),
         ExportFormat::PDF => Err(anyhow::anyhow!(
             "PDF export not yet implemented - coming in Phase 2"
         )),
@@ -129,12 +139,14 @@ mod tests {
     use super::*;
 
     #[test]
+    #[cfg(feature = "svg")]
     fn test_qr_generation() {
         let result = generate(BarcodeType::QRCode, "test", ExportFormat::SVG);
         assert!(result.is_ok());
     }
 
     #[test]
+    #[cfg(feature = "svg")]
     fn test_invalid_barcode_type() {
         let result = generate(BarcodeType::DataMatrix, "test", ExportFormat::SVG);
         assert!(result.is_err());

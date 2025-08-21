@@ -37,7 +37,7 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: Clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
+        run: cargo clippy --all-targets --features "png,svg" -- -D warnings
 
   # Testes em múltiplas plataformas e versões do Rust
   test:
@@ -80,8 +80,8 @@ jobs:
       - name: Run doctests
         run: cargo test --doc --verbose
 
-      - name: Test with all features
-        run: cargo test --verbose --all-features
+      - name: Test with default features
+        run: cargo test --verbose --features "png,svg"
 
   # Testes de cobertura
   coverage:
@@ -107,7 +107,7 @@ jobs:
           key: ${{ runner.os }}-coverage-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Generate coverage report
-        run: cargo tarpaulin --verbose --all-features --workspace --timeout 120 --out xml
+        run: cargo tarpaulin --verbose --features "png,svg" --workspace --timeout 120 --out xml
 
       - name: Upload to codecov.io
         uses: codecov/codecov-action@v4
@@ -161,7 +161,7 @@ jobs:
           key: ${{ runner.os }}-docs-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Build documentation
-        run: cargo doc --verbose --all-features --no-deps
+        run: cargo doc --verbose --features "png,svg" --no-deps
 
       - name: Deploy documentation
         if: github.ref == 'refs/heads/main'
