@@ -144,6 +144,10 @@ jobs:
   docs:
     name: Documentation
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -163,12 +167,13 @@ jobs:
       - name: Build documentation
         run: cargo doc --verbose --features "png,svg" --no-deps
 
-      - name: Deploy documentation
-        if: github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./target/doc
+      # GitHub Pages deployment (temporarily disabled)
+      # - name: Deploy documentation
+      #   if: github.ref == 'refs/heads/main'
+      #   uses: peaceiris/actions-gh-pages@v4
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     publish_dir: ./target/doc
 
   # Verificação de segurança
   security:
