@@ -11,6 +11,8 @@
 [![codecov](https://codecov.io/gh/marcioreck/quickcodes/branch/main/graph/badge.svg)](https://codecov.io/gh/marcioreck/quickcodes)
 [![Stars](https://img.shields.io/github/stars/marcioreck/quickcodes?style=social)](https://github.com/marcioreck/quickcodes)
 
+> 🎉 **QuickCodes está agora disponível no [crates.io](https://crates.io/crates/quickcodes)!**
+
 ---
 
 ## ✨ Features
