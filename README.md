@@ -179,4 +179,4 @@ Distribuído sob a licença MIT. Consulte o arquivo `LICENSE` para mais detalhes
 
 ---
 
-*QuickCodes - Desenvolvido por Márcio Reck*
+*QuickCodes - Desenvolvido por Márcio Reck, AI-Augmented Coder*
