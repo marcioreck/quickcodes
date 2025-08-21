@@ -168,10 +168,16 @@ fn generate(
 ) -> PyResult<PyObject> {
     // Parse barcode type
     let bt = match barcode_type {
+        // Phase 1: Core formats
         "QRCode" => BarcodeType::QRCode,
         "EAN13" => BarcodeType::EAN13,
         "UPCA" => BarcodeType::UPCA,
         "Code128" => BarcodeType::Code128,
+        
+        // Phase 2: Advanced 2D codes
+        "DataMatrix" => BarcodeType::DataMatrix,
+        "PDF417" => BarcodeType::PDF417,
+        "Aztec" => BarcodeType::Aztec,
         _ => {
             return Err(PyValueError::new_err(format!(
                 "Unsupported barcode type: {}",
@@ -224,10 +230,16 @@ fn generate(
 fn generate_to_file(barcode_type: &str, data: &str, output_path: &str) -> PyResult<()> {
     // Parse barcode type
     let bt = match barcode_type {
+        // Phase 1: Core formats
         "QRCode" => BarcodeType::QRCode,
         "EAN13" => BarcodeType::EAN13,
         "UPCA" => BarcodeType::UPCA,
         "Code128" => BarcodeType::Code128,
+        
+        // Phase 2: Advanced 2D codes
+        "DataMatrix" => BarcodeType::DataMatrix,
+        "PDF417" => BarcodeType::PDF417,
+        "Aztec" => BarcodeType::Aztec,
         _ => {
             return Err(PyValueError::new_err(format!(
                 "Unsupported barcode type: {}",
@@ -259,10 +271,16 @@ fn quickcodes(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(generate_to_file, m)?)?;
 
     // Add constants for convenience
+    // Phase 1: Core formats
     m.add("QR_CODE", "QRCode")?;
     m.add("EAN13", "EAN13")?;
     m.add("UPC_A", "UPCA")?;
     m.add("CODE128", "Code128")?;
+    
+    // Phase 2: Advanced 2D codes
+    m.add("DATA_MATRIX", "DataMatrix")?;
+    m.add("PDF417", "PDF417")?;
+    m.add("AZTEC", "Aztec")?;
 
     m.add("SVG", "SVG")?;
     m.add("PNG", "PNG")?;

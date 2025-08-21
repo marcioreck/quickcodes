@@ -34,6 +34,15 @@ usvg = { version = "0.44", optional = true }
 # QR Code generation
 qrcode = "0.14"
 
+# DataMatrix generation (implemented internally for now)
+# datamatrix = "0.3"  # Will add proper library support later
+
+# PDF417 generation (we'll implement basic version first)
+# pdf417 = "0.1"  # Will add if available, otherwise custom implementation
+
+# Aztec Code (we'll implement basic version first)
+# aztec = "0.1"  # Will add if available, otherwise custom implementation
+
 # SVG generation
 svg = "0.18"
 

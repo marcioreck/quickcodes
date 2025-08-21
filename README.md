@@ -31,33 +31,47 @@
 ### Python
 
 ```python
-from quickcodes import generate, read
+from quickcodes import generate_to_file
+import quickcodes as qc
 
 # Gerar QR Code de pagamento Pix
-generate("QR", "00020126580014BR.GOV.BCB.PIX0114+5551999999995204000053039865405100.005802BR5920Padaria Exemplo6009SAO PAULO62070503***6304ABCD", output="pix.svg")
+generate_to_file("QRCode", "00020126580014BR.GOV.BCB.PIX0114+5551999999995204000053039865405100.005802BR5920Padaria Exemplo6009SAO PAULO62070503***6304ABCD", "pix.svg")
 
-# Ler um código de barras de imagem
-data = read("produto.png")
-print(data)  # -> "7891234567890"
+# Gerar DataMatrix para rastreamento farmacêutico (ANVISA)
+generate_to_file("DataMatrix", "010123456789012815240101", "pharma.svg")
+
+# Gerar PDF417 para documentos oficiais
+generate_to_file("PDF417", "DRIVER LICENSE|DOE,JOHN|DOB:1990-01-01", "document.svg")
+
+# Gerar Aztec para tickets de transporte
+generate_to_file("Aztec", "TKT:12345|FROM:NYC|TO:BOS|DATE:2024-01-15", "ticket.svg")
+
+# Formatos disponíveis: QRCode, EAN13, UPCA, Code128, DataMatrix, PDF417, Aztec
 ```
 
-### JavaScript (Browser)
+### JavaScript (Browser) *[Planejado - WASM em desenvolvimento]*
 
 ```javascript
-import { generate, read } from "quickcodes-wasm";
+import { generate } from "quickcodes-wasm";
 
 // Gerar um EAN-13
 let svg = generate("EAN13", "7891234567890");
 
-// Ler QR Code da webcam
-let result = await read(videoStream);
-console.log(result);
+// Gerar DataMatrix para farmácia
+let datamatrix = generate("DataMatrix", "010123456789012815240101");
+
+// Gerar PDF417 para documentos
+let pdf417 = generate("PDF417", "DRIVER LICENSE|DOE,JOHN|1990-01-01");
+
+// Gerar Aztec para tickets
+let aztec = generate("Aztec", "TKT:12345|FROM:NYC|TO:BOS");
 ```
 
 ### 📸 Exemplos Gerados
 
-Após executar `cargo run --example basic_usage`, você encontrará estes arquivos em `examples/output/`:
+Após executar os exemplos, você encontrará estes arquivos em `examples/output/`:
 
+**Fase 1 (Básicos):**
 - **qr_hello.svg** - QR Code: "Hello, QuickCodes!"
 - **ean13_example.png** - EAN-13: 1234567890128
 - **upc_a_example.svg** - UPC-A: 036000291452  
@@ -65,26 +79,44 @@ Após executar `cargo run --example basic_usage`, você encontrará estes arquiv
 - **pix_payment.svg** - QR Code para pagamento Pix
 - **github_url.png** - QR Code com URL do GitHub
 
+**Fase 2 (Avançados):**
+- **datamatrix_pharma.svg** - DataMatrix farmacêutico (ANVISA)
+- **datamatrix_industrial.png** - DataMatrix industrial
+- **pdf417_document.svg** - PDF417 para documentos
+- **pdf417_invoice.png** - PDF417 com dados grandes
+- **aztec_transport.svg** - Aztec para transporte
+- **aztec_event.png** - Aztec para eventos
+- **datamatrix_unicode.svg** - DataMatrix com Unicode
+
 ---
 
 ## 🎯 Status Atual
 
-✅ **MVP Funcional Completo!**
+✅ **Fase 2 - Códigos 2D Avançados Implementados!**
 
-- ✅ 4 formatos de código implementados (QR, EAN-13, UPC-A, Code128)
+- ✅ 7 formatos de código implementados (QR, EAN-13, UPC-A, Code128, DataMatrix, PDF417, Aztec)
 - ✅ 2 formatos de exportação (SVG, PNG)
-- ✅ 40 testes passando (25 unitários + 12 integração + 3 doctests)
-- ✅ API unificada Rust e Python
-- ✅ Bindings Python com PyO3
+- ✅ 56 testes passando (41 unitários + 12 integração + 3 doctests)
+- ✅ API unificada Rust e Python para todos os formatos
+- ✅ Bindings Python com PyO3 atualizados
 - ✅ Código 100% limpo (0 warnings, clippy aprovado)
-- ✅ Exemplos funcionais e documentação completa
+- ✅ Exemplos funcionais da Fase 2 e documentação completa
+- ✅ Suporte completo para casos de uso farmacêuticos (DataMatrix/ANVISA)
+- ✅ Suporte para documentos oficiais (PDF417)
+- ✅ Suporte para tickets de transporte (Aztec)
 
 ```bash
 # Teste a biblioteca agora:
 git clone https://github.com/marcioreck/quickcodes
 cd quickcodes
+
+# Exemplos da Fase 1 (formatos básicos)
 cargo run --example basic_usage
-# Veja os códigos gerados em examples/output/
+
+# Exemplos da Fase 2 (códigos 2D avançados)
+cargo run --example phase2_usage
+
+# Veja todos os códigos gerados em examples/output/
 ```
 
 ---
@@ -108,13 +140,13 @@ cargo run --example basic_usage
   * [x] Configurações de tamanho e DPI
 * [x] **Bindings Iniciais**
   * [x] Python (PyO3) - Implementado e testado
-  * [ ] JavaScript/Node.js (NAPI-RS)
+  * [ ] JavaScript/Node.js (NAPI-RS) [postergado para realizar após API estar completa, toda a fase 2]
 
-### 🔧 **Fase 2 - Expansão Industrial**
-* [ ] **Códigos 2D Avançados**
-  * [ ] DataMatrix (farmacêutica/ANVISA)
-  * [ ] PDF417 (documentos oficiais)
-  * [ ] Aztec Code (transporte)
+### 🔧 **Fase 2 - Expansão Industrial** ⚡ EM PROGRESSO
+* [x] **Códigos 2D Avançados** ✅ CONCLUÍDO
+  * [x] DataMatrix (farmacêutica/ANVISA)
+  * [x] PDF417 (documentos oficiais)
+  * [x] Aztec Code (transporte)
 * [ ] **Leitura/Decodificação**
   * [ ] Leitor de imagens estáticas
   * [ ] Algoritmos de detecção e correção

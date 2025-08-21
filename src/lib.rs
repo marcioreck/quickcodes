@@ -4,8 +4,8 @@
 //!
 //! ## Features
 //!
-//! - Generate and read multiple barcode formats (EAN-13, UPC-A, Code128, QR Code)
-//! - Export to PNG, SVG formats
+//! - Generate and read multiple barcode formats (EAN-13, UPC-A, Code128, QR Code, DataMatrix, PDF417, Aztec)
+//! - Export to PNG, SVG, PDF formats
 //! - High performance Rust core
 //! - Cross-platform support
 //!
@@ -73,11 +73,27 @@ pub fn generate(
     format: ExportFormat,
 ) -> AnyhowResult<Vec<u8>> {
     let barcode = match barcode_type {
+        // Phase 1: Core formats
         BarcodeType::QRCode => generators::qr::generate_qr(data)?,
         BarcodeType::EAN13 => generators::ean13::generate_ean13(data)?,
         BarcodeType::UPCA => generators::upc::generate_upc_a(data)?,
         BarcodeType::Code128 => generators::code128::generate_code128(data)?,
-        _ => return Err(anyhow::anyhow!("Barcode type not yet implemented")),
+        
+        // Phase 2: Advanced 2D codes
+        BarcodeType::DataMatrix => generators::datamatrix::generate_datamatrix(data)?,
+        BarcodeType::PDF417 => generators::pdf417::generate_pdf417(data)?,
+        BarcodeType::Aztec => generators::aztec::generate_aztec(data)?,
+        
+        // Phase 3: Legacy formats (not yet implemented)
+        BarcodeType::Code39 | BarcodeType::ITF14 | BarcodeType::Codabar => {
+            return Err(anyhow::anyhow!("Barcode type {} not yet implemented - coming in Phase 3", 
+                match barcode_type {
+                    BarcodeType::Code39 => "Code39",
+                    BarcodeType::ITF14 => "ITF-14", 
+                    BarcodeType::Codabar => "Codabar",
+                    _ => unreachable!()
+                }))
+        }
     };
 
     match format {
@@ -147,8 +163,29 @@ mod tests {
 
     #[test]
     #[cfg(feature = "svg")]
-    fn test_invalid_barcode_type() {
+    fn test_datamatrix_generation() {
         let result = generate(BarcodeType::DataMatrix, "test", ExportFormat::SVG);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    #[cfg(feature = "svg")]
+    fn test_pdf417_generation() {
+        let result = generate(BarcodeType::PDF417, "test", ExportFormat::SVG);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    #[cfg(feature = "svg")]
+    fn test_aztec_generation() {
+        let result = generate(BarcodeType::Aztec, "test", ExportFormat::SVG);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    #[cfg(feature = "svg")]
+    fn test_unimplemented_barcode_type() {
+        let result = generate(BarcodeType::Code39, "test", ExportFormat::SVG);
         assert!(result.is_err());
     }
 }
