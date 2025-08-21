@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["generate_ean13","generate_ean13_with_config"]};

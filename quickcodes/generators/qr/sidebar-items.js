@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["generate_qr","generate_qr_with_config"]};

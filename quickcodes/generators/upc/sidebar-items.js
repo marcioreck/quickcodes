@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["generate_upc_a","generate_upc_a_with_config"]};

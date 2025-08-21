@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["generate_code128","generate_code128_with_config"]};

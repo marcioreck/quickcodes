@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["BarcodeModules","BarcodeType","ExportFormat","QRErrorCorrection","QuickCodesError"],"struct":["Barcode","BarcodeConfig","QRConfig"],"type":["Result"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["code128","ean13","qr","upc"]};
