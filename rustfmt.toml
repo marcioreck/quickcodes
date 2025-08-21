@@ -1,0 +1,17 @@
+# Rust formatting configuration for QuickCodes
+# This ensures consistent code formatting across the project
+
+# Basic formatting
+max_width = 100
+hard_tabs = false
+tab_spaces = 4
+
+# Import formatting
+reorder_imports = true
+
+# Code style
+newline_style = "Unix"
+edition = "2021"
+
+# Misc
+use_small_heuristics = "Default"

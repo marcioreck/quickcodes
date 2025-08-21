@@ -1,5 +1,5 @@
 //! Phase 2 Usage Examples
-//! 
+//!
 //! This example demonstrates the new advanced 2D barcode formats
 //! introduced in Phase 2: DataMatrix, PDF417, and Aztec Code.
 

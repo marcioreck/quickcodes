@@ -1,0 +1,114 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for QuickCodes
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+assignees: ["marcioreck"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please help us understand your needs.
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature Description
+      description: A clear and concise description of the feature you'd like to see
+      placeholder: Describe the feature you want to add
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Describe the problem this feature would solve
+      placeholder: |
+        What problem does this feature solve?
+        How would you use this feature?
+        Who would benefit from this feature?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: How do you think this feature should work?
+      placeholder: Describe your proposed solution in detail
+    validations:
+      required: true
+
+  - type: textarea
+    id: api-design
+    attributes:
+      label: Proposed API Design
+      description: If applicable, show how the API might look
+      render: rust
+      placeholder: |
+        // Example of how the new API might work
+        use quickcodes::*;
+        
+        let result = new_feature_function(parameters);
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What alternative solutions have you considered?
+      placeholder: Describe any alternative approaches you've considered
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - "Low - Nice to have"
+        - "Medium - Would be helpful"
+        - "High - Important for my use case"
+        - "Critical - Blocking my project"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Implementation Complexity
+      description: How complex do you think this feature would be to implement?
+      options:
+        - "Simple - Minor change"
+        - "Medium - Moderate effort"
+        - "Complex - Significant development"
+        - "I'm not sure"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: implementation
+    attributes:
+      label: Implementation
+      description: Are you willing to contribute to implementing this feature?
+      options:
+        - label: I'm willing to implement this feature myself
+        - label: I can help with testing and feedback
+        - label: I can help with documentation
+        - label: I would like someone else to implement this
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues and feature requests
+          required: true
+        - label: This feature aligns with QuickCodes' goals of barcode/QR generation
+          required: true
+        - label: I have provided a clear use case for this feature
+          required: true

@@ -1,11 +1,9 @@
 //! PDF417 barcode generator
-//! 
+//!
 //! PDF417 is a stacked linear barcode commonly used in official documents,
 //! driver's licenses, and identification cards.
 
-use crate::types::{
-    Barcode, BarcodeConfig, BarcodeModules, BarcodeType, QuickCodesError, Result,
-};
+use crate::types::{Barcode, BarcodeConfig, BarcodeModules, BarcodeType, QuickCodesError, Result};
 
 /// PDF417 configuration options
 #[derive(Debug, Clone)]
@@ -64,7 +62,11 @@ fn generate_pdf417_matrix(data: &str, config: &PDF417Config) -> Result<Vec<Vec<b
     // 4. Row indicators and column indicators
 
     let data_bytes = data.as_bytes();
-    let rows = calculate_rows(data_bytes.len(), config.columns as usize, config.error_correction);
+    let rows = calculate_rows(
+        data_bytes.len(),
+        config.columns as usize,
+        config.error_correction,
+    );
     let cols = config.columns as usize * 17 + 34; // Each data column is 17 modules + start/stop
 
     let mut matrix = vec![vec![false; cols]; rows];
@@ -82,7 +84,7 @@ fn generate_pdf417_matrix(data: &str, config: &PDF417Config) -> Result<Vec<Vec<b
         for (col_idx, cell) in row[start_data..end_data].iter_mut().enumerate() {
             let byte_idx = (row_idx * (end_data - start_data) + col_idx) / 8;
             let bit_idx = (row_idx * (end_data - start_data) + col_idx) % 8;
-            
+
             if byte_idx < data_bytes.len() {
                 *cell = (data_bytes[byte_idx] >> (7 - bit_idx)) & 1 == 1;
             } else {
@@ -117,10 +119,10 @@ fn calculate_rows(data_len: usize, columns: usize, error_level: u8) -> usize {
     };
 
     let total_codewords = data_len + error_codewords + 1; // +1 for length indicator
-    let rows = (total_codewords + columns - 1) / columns; // Ceiling division
-    
+    let rows = total_codewords.div_ceil(columns);
+
     // PDF417 must have 3-90 rows
-    rows.max(3).min(90)
+    rows.clamp(3, 90)
 }
 
 #[cfg(test)]
@@ -170,14 +172,29 @@ mod tests {
         let result1 = calculate_rows(10, 6, 2);
         let result2 = calculate_rows(100, 6, 2);
         let result3 = calculate_rows(1000, 6, 2);
-        
+
         // PDF417 should have 3-90 rows
-        assert!(result1 >= 3 && result1 <= 90, "Rows should be 3-90, got {}", result1);
-        assert!(result2 >= 3 && result2 <= 90, "Rows should be 3-90, got {}", result2);
-        assert!(result3 >= 3 && result3 <= 90, "Rows should be 3-90, got {}", result3);
-        
+        assert!(
+            (3..=90).contains(&result1),
+            "Rows should be 3-90, got {}",
+            result1
+        );
+        assert!(
+            (3..=90).contains(&result2),
+            "Rows should be 3-90, got {}",
+            result2
+        );
+        assert!(
+            (3..=90).contains(&result3),
+            "Rows should be 3-90, got {}",
+            result3
+        );
+
         // Larger data should need more rows
         assert!(result2 > result1, "More data should need more rows");
-        assert!(result3 >= result2, "Much more data should need at least as many rows");
+        assert!(
+            result3 >= result2,
+            "Much more data should need at least as many rows"
+        );
     }
 }

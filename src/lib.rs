@@ -78,21 +78,23 @@ pub fn generate(
         BarcodeType::EAN13 => generators::ean13::generate_ean13(data)?,
         BarcodeType::UPCA => generators::upc::generate_upc_a(data)?,
         BarcodeType::Code128 => generators::code128::generate_code128(data)?,
-        
+
         // Phase 2: Advanced 2D codes
         BarcodeType::DataMatrix => generators::datamatrix::generate_datamatrix(data)?,
         BarcodeType::PDF417 => generators::pdf417::generate_pdf417(data)?,
         BarcodeType::Aztec => generators::aztec::generate_aztec(data)?,
-        
+
         // Phase 3: Legacy formats (not yet implemented)
         BarcodeType::Code39 | BarcodeType::ITF14 | BarcodeType::Codabar => {
-            return Err(anyhow::anyhow!("Barcode type {} not yet implemented - coming in Phase 3", 
+            return Err(anyhow::anyhow!(
+                "Barcode type {} not yet implemented - coming in Phase 3",
                 match barcode_type {
                     BarcodeType::Code39 => "Code39",
-                    BarcodeType::ITF14 => "ITF-14", 
+                    BarcodeType::ITF14 => "ITF-14",
                     BarcodeType::Codabar => "Codabar",
-                    _ => unreachable!()
-                }))
+                    _ => unreachable!(),
+                }
+            ))
         }
     };
 

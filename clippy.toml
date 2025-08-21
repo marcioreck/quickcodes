@@ -1,0 +1,21 @@
+# Clippy configuration for QuickCodes
+# This file defines linting rules for consistent code quality
+
+# Complexity thresholds
+cognitive-complexity-threshold = 25
+type-complexity-threshold = 100
+too-many-arguments-threshold = 8
+too-many-lines-threshold = 150
+
+# Allow certain types and methods that are commonly used
+disallowed-methods = []
+disallowed-types = []
+
+# Documentation requirements  
+missing-docs-in-crate-items = true
+
+# Avoid certain constructs
+avoid-breaking-exported-api = true
+
+# MSRV compatibility
+msrv = "1.70.0"
