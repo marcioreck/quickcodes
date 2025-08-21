@@ -167,13 +167,12 @@ jobs:
       - name: Build documentation
         run: cargo doc --verbose --features "png,svg" --no-deps
 
-      # GitHub Pages deployment (temporarily disabled)
-      # - name: Deploy documentation
-      #   if: github.ref == 'refs/heads/main'
-      #   uses: peaceiris/actions-gh-pages@v4
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     publish_dir: ./target/doc
+      - name: Deploy documentation
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/doc
 
   # Verificação de segurança
   security:
