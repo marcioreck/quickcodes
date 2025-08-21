@@ -1,0 +1,51 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "quickcodes"
+version = "0.1.0"
+description = "Universal Barcode & QR Toolkit - Generate and read 1D and 2D codes"
+authors = [
+    {name = "Márcio Reck", email = "marcio@fazmercado.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+homepage = "https://github.com/marcioreck/quickcodes"
+repository = "https://github.com/marcioreck/quickcodes"
+documentation = "https://docs.rs/quickcodes"
+keywords = ["barcode", "qrcode", "ean", "code128", "datamatrix"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Rust",
+    "Topic :: Multimedia :: Graphics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">=3.8"
+
+[project.urls]
+"Bug Tracker" = "https://github.com/marcioreck/quickcodes/issues"
+"Changelog" = "https://github.com/marcioreck/quickcodes/blob/main/CHANGELOG.md"
+"Documentation" = "https://docs.rs/quickcodes"
+"Homepage" = "https://github.com/marcioreck/quickcodes"
+"Repository" = "https://github.com/marcioreck/quickcodes"
+
+[tool.maturin]
+python-source = "python"
+module-name = "quickcodes"
+features = ["python"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-benchmark>=4.0",
+    "pillow>=9.0",  # For testing PNG output
+]

@@ -14,22 +14,29 @@
 //! ```rust
 //! use quickcodes::{generate, BarcodeType, ExportFormat};
 //!
-//! // Generate a QR Code
-//! let qr_svg = generate(BarcodeType::QRCode, "Hello, World!", ExportFormat::SVG)?;
+//! fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     // Generate a QR Code
+//!     let qr_svg = generate(BarcodeType::QRCode, "Hello, World!", ExportFormat::SVG)?;
 //!
-//! // Generate an EAN-13 barcode
-//! let ean_png = generate(BarcodeType::EAN13, "1234567890123", ExportFormat::PNG)?;
+//!     // Generate an EAN-13 barcode
+//!     let ean_png = generate(BarcodeType::EAN13, "123456789012", ExportFormat::PNG)?;
+//!     
+//!     Ok(())
+//! }
 //! ```
 
-pub mod types;
-pub mod generators;
 pub mod exporters;
+pub mod generators;
 pub mod readers;
+pub mod types;
+
+#[cfg(feature = "python")]
+pub mod python;
 
 // Re-export public API
-pub use types::*;
-pub use generators::*;
 pub use exporters::*;
+pub use generators::*;
+pub use types::*;
 
 use anyhow::Result as AnyhowResult;
 
@@ -50,11 +57,15 @@ use anyhow::Result as AnyhowResult;
 /// ```rust
 /// use quickcodes::{generate, BarcodeType, ExportFormat};
 ///
-/// // Generate QR Code as SVG
-/// let svg_data = generate(BarcodeType::QRCode, "https://example.com", ExportFormat::SVG)?;
+/// fn main() -> Result<(), Box<dyn std::error::Error>> {
+///     // Generate QR Code as SVG
+///     let svg_data = generate(BarcodeType::QRCode, "https://example.com", ExportFormat::SVG)?;
 ///
-/// // Generate EAN-13 as PNG
-/// let png_data = generate(BarcodeType::EAN13, "1234567890123", ExportFormat::PNG)?;
+///     // Generate EAN-13 as PNG
+///     let png_data = generate(BarcodeType::EAN13, "123456789012", ExportFormat::PNG)?;
+///     
+///     Ok(())
+/// }
 /// ```
 pub fn generate(
     barcode_type: BarcodeType,
@@ -72,7 +83,9 @@ pub fn generate(
     match format {
         ExportFormat::SVG => Ok(exporters::svg::export_svg(&barcode)?),
         ExportFormat::PNG => Ok(exporters::png::export_png(&barcode)?),
-        ExportFormat::PDF => Err(anyhow::anyhow!("PDF export not yet implemented - coming in Phase 2")),
+        ExportFormat::PDF => Err(anyhow::anyhow!(
+            "PDF export not yet implemented - coming in Phase 2"
+        )),
     }
 }
 
@@ -89,11 +102,15 @@ pub fn generate(
 /// ```rust
 /// use quickcodes::{generate_to_file, BarcodeType};
 ///
-/// // Generate QR Code and save as SVG
-/// generate_to_file(BarcodeType::QRCode, "Hello", "output.svg")?;
+/// fn main() -> Result<(), Box<dyn std::error::Error>> {
+///     // Generate QR Code and save as SVG
+///     generate_to_file(BarcodeType::QRCode, "Hello", "output.svg")?;
 ///
-/// // Generate EAN-13 and save as PNG
-/// generate_to_file(BarcodeType::EAN13, "1234567890123", "barcode.png")?;
+///     // Generate EAN-13 and save as PNG
+///     generate_to_file(BarcodeType::EAN13, "123456789012", "barcode.png")?;
+///     
+///     Ok(())
+/// }
 /// ```
 pub fn generate_to_file(
     barcode_type: BarcodeType,
@@ -102,7 +119,7 @@ pub fn generate_to_file(
 ) -> AnyhowResult<()> {
     let format = ExportFormat::from_extension(output_path)?;
     let barcode_data = generate(barcode_type, data, format)?;
-    
+
     std::fs::write(output_path, barcode_data)?;
     Ok(())
 }

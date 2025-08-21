@@ -1,6 +1,6 @@
 //! Code128 barcode generator
 
-use crate::types::{Barcode, BarcodeConfig, BarcodeModules, BarcodeType, Result, QuickCodesError};
+use crate::types::{Barcode, BarcodeConfig, BarcodeModules, BarcodeType, QuickCodesError, Result};
 
 /// Generate a Code128 barcode with default configuration
 pub fn generate_code128(data: &str) -> Result<Barcode> {
@@ -11,22 +11,22 @@ pub fn generate_code128(data: &str) -> Result<Barcode> {
 pub fn generate_code128_with_config(data: &str, config: &BarcodeConfig) -> Result<Barcode> {
     // For now, implement a basic Code128 Auto mode
     // This is a simplified implementation - full Code128 is quite complex
-    
+
     if data.is_empty() {
         return Err(QuickCodesError::InvalidData(
-            "Code128 data cannot be empty".to_string()
+            "Code128 data cannot be empty".to_string(),
         ));
     }
-    
+
     // Generate a basic pattern (placeholder implementation)
     // In a full implementation, this would:
     // 1. Analyze the data to choose optimal encoding (A/B/C)
     // 2. Generate proper Code128 patterns
     // 3. Calculate check digit
     // 4. Add start/stop codes
-    
+
     let pattern = generate_basic_code128_pattern(data)?;
-    
+
     Ok(Barcode {
         barcode_type: BarcodeType::Code128,
         data: data.to_string(),
@@ -39,12 +39,14 @@ pub fn generate_code128_with_config(data: &str, config: &BarcodeConfig) -> Resul
 fn generate_basic_code128_pattern(data: &str) -> Result<Vec<bool>> {
     // This is a placeholder implementation
     // Real Code128 would need proper encoding tables and algorithms
-    
+
     let mut pattern = Vec::new();
-    
+
     // Start pattern (simplified)
-    pattern.extend([true, true, false, true, false, false, true, true, false, true, false]);
-    
+    pattern.extend([
+        true, true, false, true, false, false, true, true, false, true, false,
+    ]);
+
     // Data encoding (very simplified - just alternating pattern based on characters)
     for (i, ch) in data.chars().enumerate() {
         let char_code = ch as u8;
@@ -53,16 +55,18 @@ fn generate_basic_code128_pattern(data: &str) -> Result<Vec<bool>> {
             1 => [true, false, true, true, false, false, true],
             _ => [false, true, true, false, true, true, false],
         };
-        
+
         // Modify pattern based on character
         for (j, &bit) in base_pattern.iter().enumerate() {
             pattern.push(bit ^ ((char_code + j as u8) % 2 == 0));
         }
     }
-    
+
     // Stop pattern (simplified)
-    pattern.extend([true, true, false, false, true, false, true, true, false, false, true]);
-    
+    pattern.extend([
+        true, true, false, false, true, false, true, true, false, false, true,
+    ]);
+
     Ok(pattern)
 }
 
@@ -74,11 +78,11 @@ mod tests {
     fn test_code128_generation() {
         let result = generate_code128("Hello123");
         assert!(result.is_ok());
-        
+
         let barcode = result.unwrap();
         assert_eq!(barcode.barcode_type, BarcodeType::Code128);
         assert_eq!(barcode.data, "Hello123");
-        
+
         match barcode.modules {
             BarcodeModules::Linear(pattern) => {
                 assert!(!pattern.is_empty());

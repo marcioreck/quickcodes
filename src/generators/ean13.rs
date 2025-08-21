@@ -1,6 +1,6 @@
 //! EAN-13 barcode generator
 
-use crate::types::{Barcode, BarcodeConfig, BarcodeModules, BarcodeType, Result, QuickCodesError};
+use crate::types::{Barcode, BarcodeConfig, BarcodeModules, BarcodeType, QuickCodesError, Result};
 
 // EAN-13 encoding patterns
 const LEFT_PATTERNS: [[u8; 7]; 10] = [
@@ -70,10 +70,10 @@ pub fn generate_ean13(data: &str) -> Result<Barcode> {
 pub fn generate_ean13_with_config(data: &str, config: &BarcodeConfig) -> Result<Barcode> {
     // Validate and process input data
     let digits = process_ean13_data(data)?;
-    
+
     // Generate the barcode pattern
     let pattern = generate_ean13_pattern(&digits)?;
-    
+
     Ok(Barcode {
         barcode_type: BarcodeType::EAN13,
         data: format_ean13_data(&digits),
@@ -84,20 +84,20 @@ pub fn generate_ean13_with_config(data: &str, config: &BarcodeConfig) -> Result<
 
 /// Process and validate EAN-13 input data
 fn process_ean13_data(data: &str) -> Result<Vec<u8>> {
-    let cleaned = data.replace(' ', "").replace('-', "");
-    
+    let cleaned = data.replace([' ', '-'], "");
+
     // Check if all characters are digits
     if !cleaned.chars().all(|c| c.is_ascii_digit()) {
         return Err(QuickCodesError::InvalidData(
-            "EAN-13 data must contain only digits".to_string()
+            "EAN-13 data must contain only digits".to_string(),
         ));
     }
-    
+
     let digits: Vec<u8> = cleaned
         .chars()
         .map(|c| c.to_digit(10).unwrap() as u8)
         .collect();
-    
+
     match digits.len() {
         12 => {
             // Calculate and append check digit
@@ -110,15 +110,15 @@ fn process_ean13_data(data: &str) -> Result<Vec<u8>> {
             // Verify check digit
             let check_digit = calculate_ean13_check_digit(&digits[..12]);
             if check_digit != digits[12] {
-                return Err(QuickCodesError::InvalidData(
-                    format!("Invalid EAN-13 check digit. Expected {}, got {}", 
-                            check_digit, digits[12])
-                ));
+                return Err(QuickCodesError::InvalidData(format!(
+                    "Invalid EAN-13 check digit. Expected {}, got {}",
+                    check_digit, digits[12]
+                )));
             }
             Ok(digits)
         }
         _ => Err(QuickCodesError::InvalidData(
-            "EAN-13 data must be 12 or 13 digits long".to_string()
+            "EAN-13 data must be 12 or 13 digits long".to_string(),
         )),
     }
 }
@@ -136,7 +136,7 @@ fn calculate_ean13_check_digit(digits: &[u8]) -> u8 {
             }
         })
         .sum();
-    
+
     let remainder = sum % 10;
     if remainder == 0 {
         0
@@ -149,43 +149,45 @@ fn calculate_ean13_check_digit(digits: &[u8]) -> u8 {
 fn generate_ean13_pattern(digits: &[u8]) -> Result<Vec<bool>> {
     if digits.len() != 13 {
         return Err(QuickCodesError::GenerationError(
-            "EAN-13 requires exactly 13 digits".to_string()
+            "EAN-13 requires exactly 13 digits".to_string(),
         ));
     }
-    
+
     let mut pattern = Vec::new();
-    
+
     // Start guard
     pattern.extend(START_GUARD.iter().map(|&b| b == 1));
-    
+
     // First digit determines the pattern for left side
     let first_digit = digits[0] as usize;
     let left_pattern = FIRST_DIGIT_PATTERNS[first_digit];
-    
+
     // Left side (digits 1-6)
     for (i, &digit) in digits[1..7].iter().enumerate() {
         let digit_pattern = match left_pattern.chars().nth(i).unwrap() {
             'L' => LEFT_PATTERNS[digit as usize],
             'G' => LEFT_PATTERNS_G[digit as usize],
-            _ => return Err(QuickCodesError::GenerationError(
-                "Invalid left pattern character".to_string()
-            )),
+            _ => {
+                return Err(QuickCodesError::GenerationError(
+                    "Invalid left pattern character".to_string(),
+                ))
+            }
         };
         pattern.extend(digit_pattern.iter().map(|&b| b == 1));
     }
-    
+
     // Center guard
     pattern.extend(CENTER_GUARD.iter().map(|&b| b == 1));
-    
+
     // Right side (digits 7-12)
     for &digit in &digits[7..13] {
         let digit_pattern = RIGHT_PATTERNS[digit as usize];
         pattern.extend(digit_pattern.iter().map(|&b| b == 1));
     }
-    
+
     // End guard
     pattern.extend(END_GUARD.iter().map(|&b| b == 1));
-    
+
     Ok(pattern)
 }
 
@@ -210,11 +212,11 @@ mod tests {
     fn test_ean13_generation_with_12_digits() {
         let result = generate_ean13("123456789012");
         assert!(result.is_ok());
-        
+
         let barcode = result.unwrap();
         assert_eq!(barcode.barcode_type, BarcodeType::EAN13);
         assert_eq!(barcode.data, "1234567890128"); // With check digit
-        
+
         match barcode.modules {
             BarcodeModules::Linear(pattern) => {
                 // EAN-13 should have 95 modules total
@@ -228,7 +230,7 @@ mod tests {
     fn test_ean13_generation_with_13_digits() {
         let result = generate_ean13("1234567890128");
         assert!(result.is_ok());
-        
+
         let barcode = result.unwrap();
         assert_eq!(barcode.data, "1234567890128");
     }
@@ -255,7 +257,7 @@ mod tests {
     fn test_ean13_with_spaces_and_hyphens() {
         let result = generate_ean13("123 456 789-012");
         assert!(result.is_ok());
-        
+
         let barcode = result.unwrap();
         assert_eq!(barcode.data, "1234567890128");
     }

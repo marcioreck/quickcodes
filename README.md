@@ -1,11 +1,15 @@
 # 📦 QuickCodes
 
 **Universal Barcode & QR Toolkit**
+
 *Gere e leia códigos de barras (1D) e 2D em múltiplos padrões, com performance e simplicidade.*
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Build](https://img.shields.io/github/actions/workflow/status/seu-usuario/quickcodes/ci.yml)]()
-[![Stars](https://img.shields.io/github/stars/seu-usuario/quickcodes?style=social)]()
+[![CI](https://github.com/marcioreck/quickcodes/actions/workflows/ci.yml/badge.svg)](https://github.com/marcioreck/quickcodes/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.md)
+[![Crates.io](https://img.shields.io/crates/v/quickcodes.svg)](https://crates.io/crates/quickcodes)
+[![Documentation](https://docs.rs/quickcodes/badge.svg)](https://docs.rs/quickcodes)
+[![codecov](https://codecov.io/gh/marcioreck/quickcodes/branch/main/graph/badge.svg)](https://codecov.io/gh/marcioreck/quickcodes)
+[![Stars](https://img.shields.io/github/stars/marcioreck/quickcodes?style=social)](https://github.com/marcioreck/quickcodes)
 
 ---
 
@@ -67,13 +71,15 @@ Após executar `cargo run --example basic_usage`, você encontrará estes arquiv
 
 - ✅ 4 formatos de código implementados (QR, EAN-13, UPC-A, Code128)
 - ✅ 2 formatos de exportação (SVG, PNG)
-- ✅ 25 testes unitários passando
-- ✅ API unificada e fácil de usar
-- ✅ Exemplos funcionais com arquivos reais gerados
+- ✅ 40 testes passando (25 unitários + 12 integração + 3 doctests)
+- ✅ API unificada Rust e Python
+- ✅ Bindings Python com PyO3
+- ✅ Código 100% limpo (0 warnings, clippy aprovado)
+- ✅ Exemplos funcionais e documentação completa
 
 ```bash
 # Teste a biblioteca agora:
-git clone <repo>
+git clone https://github.com/marcioreck/quickcodes
 cd quickcodes
 cargo run --example basic_usage
 # Veja os códigos gerados em examples/output/
@@ -98,8 +104,8 @@ cargo run --example basic_usage
   * [x] SVG (vetorial, escalável)
   * [x] PNG (raster, alta qualidade)
   * [x] Configurações de tamanho e DPI
-* [ ] **Bindings Iniciais**
-  * [ ] Python (PyO3)
+* [x] **Bindings Iniciais**
+  * [x] Python (PyO3) - Implementado e testado
   * [ ] JavaScript/Node.js (NAPI-RS)
 
 ### 🔧 **Fase 2 - Expansão Industrial**
@@ -161,3 +167,16 @@ Distribuído sob a licença MIT. Consulte o arquivo `LICENSE` para mais detalhes
 
 ---
 
+## Autor
+
+**Márcio Reck**
+- Portfólio: [https://fazmercado.com](https://fazmercado.com)
+- GitHub: [@marcioreck](https://github.com/marcioreck)
+
+## Agradecimentos
+
+- **Comunidade**: Pelos feedbacks e contribuições
+
+---
+
+*QuickCodes - Desenvolvido por Márcio Reck*

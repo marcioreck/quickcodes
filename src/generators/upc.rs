@@ -1,6 +1,6 @@
 //! UPC-A barcode generator
 
-use crate::types::{Barcode, BarcodeConfig, BarcodeModules, BarcodeType, Result, QuickCodesError};
+use crate::types::{Barcode, BarcodeConfig, BarcodeModules, BarcodeType, QuickCodesError, Result};
 
 // UPC-A uses the same patterns as EAN-13 for the digits
 // Left side patterns (odd positions)
@@ -45,10 +45,10 @@ pub fn generate_upc_a(data: &str) -> Result<Barcode> {
 pub fn generate_upc_a_with_config(data: &str, config: &BarcodeConfig) -> Result<Barcode> {
     // Validate and process input data
     let digits = process_upc_a_data(data)?;
-    
+
     // Generate the barcode pattern
     let pattern = generate_upc_a_pattern(&digits)?;
-    
+
     Ok(Barcode {
         barcode_type: BarcodeType::UPCA,
         data: format_upc_a_data(&digits),
@@ -59,20 +59,20 @@ pub fn generate_upc_a_with_config(data: &str, config: &BarcodeConfig) -> Result<
 
 /// Process and validate UPC-A input data
 fn process_upc_a_data(data: &str) -> Result<Vec<u8>> {
-    let cleaned = data.replace(' ', "").replace('-', "");
-    
+    let cleaned = data.replace([' ', '-'], "");
+
     // Check if all characters are digits
     if !cleaned.chars().all(|c| c.is_ascii_digit()) {
         return Err(QuickCodesError::InvalidData(
-            "UPC-A data must contain only digits".to_string()
+            "UPC-A data must contain only digits".to_string(),
         ));
     }
-    
+
     let digits: Vec<u8> = cleaned
         .chars()
         .map(|c| c.to_digit(10).unwrap() as u8)
         .collect();
-    
+
     match digits.len() {
         11 => {
             // Calculate and append check digit
@@ -85,15 +85,15 @@ fn process_upc_a_data(data: &str) -> Result<Vec<u8>> {
             // Verify check digit
             let check_digit = calculate_upc_a_check_digit(&digits[..11]);
             if check_digit != digits[11] {
-                return Err(QuickCodesError::InvalidData(
-                    format!("Invalid UPC-A check digit. Expected {}, got {}", 
-                            check_digit, digits[11])
-                ));
+                return Err(QuickCodesError::InvalidData(format!(
+                    "Invalid UPC-A check digit. Expected {}, got {}",
+                    check_digit, digits[11]
+                )));
             }
             Ok(digits)
         }
         _ => Err(QuickCodesError::InvalidData(
-            "UPC-A data must be 11 or 12 digits long".to_string()
+            "UPC-A data must be 11 or 12 digits long".to_string(),
         )),
     }
 }
@@ -111,7 +111,7 @@ fn calculate_upc_a_check_digit(digits: &[u8]) -> u8 {
             }
         })
         .sum();
-    
+
     let remainder = sum % 10;
     if remainder == 0 {
         0
@@ -124,33 +124,33 @@ fn calculate_upc_a_check_digit(digits: &[u8]) -> u8 {
 fn generate_upc_a_pattern(digits: &[u8]) -> Result<Vec<bool>> {
     if digits.len() != 12 {
         return Err(QuickCodesError::GenerationError(
-            "UPC-A requires exactly 12 digits".to_string()
+            "UPC-A requires exactly 12 digits".to_string(),
         ));
     }
-    
+
     let mut pattern = Vec::new();
-    
+
     // Start guard
     pattern.extend(START_GUARD.iter().map(|&b| b == 1));
-    
+
     // Left side (first 6 digits)
     for &digit in &digits[0..6] {
         let digit_pattern = LEFT_PATTERNS[digit as usize];
         pattern.extend(digit_pattern.iter().map(|&b| b == 1));
     }
-    
+
     // Center guard
     pattern.extend(CENTER_GUARD.iter().map(|&b| b == 1));
-    
+
     // Right side (last 6 digits)
     for &digit in &digits[6..12] {
         let digit_pattern = RIGHT_PATTERNS[digit as usize];
         pattern.extend(digit_pattern.iter().map(|&b| b == 1));
     }
-    
+
     // End guard
     pattern.extend(END_GUARD.iter().map(|&b| b == 1));
-    
+
     Ok(pattern)
 }
 
@@ -175,11 +175,11 @@ mod tests {
     fn test_upc_a_generation_with_11_digits() {
         let result = generate_upc_a("03600029145");
         assert!(result.is_ok());
-        
+
         let barcode = result.unwrap();
         assert_eq!(barcode.barcode_type, BarcodeType::UPCA);
         assert_eq!(barcode.data, "036000291452"); // With check digit
-        
+
         match barcode.modules {
             BarcodeModules::Linear(pattern) => {
                 // UPC-A should have 95 modules total (same as EAN-13)
@@ -193,7 +193,7 @@ mod tests {
     fn test_upc_a_generation_with_12_digits() {
         let result = generate_upc_a("036000291452");
         assert!(result.is_ok());
-        
+
         let barcode = result.unwrap();
         assert_eq!(barcode.data, "036000291452");
     }

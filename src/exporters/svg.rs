@@ -1,6 +1,6 @@
 //! SVG export functionality
 
-use crate::types::{Barcode, BarcodeModules, BarcodeType, Result, QuickCodesError};
+use crate::types::{Barcode, BarcodeModules, BarcodeType, QuickCodesError, Result};
 use svg::node::element::{Rectangle, Text};
 use svg::Document;
 
@@ -17,24 +17,28 @@ fn export_linear_svg(barcode: &Barcode, pattern: &[bool]) -> Result<Vec<u8>> {
     let module_width = 2.0; // Width of each module in SVG units
     let height = 60.0; // Height of the barcode
     let margin = barcode.config.margin as f64;
-    let text_height = if barcode.config.include_text { 20.0 } else { 0.0 };
-    
+    let text_height = if barcode.config.include_text {
+        20.0
+    } else {
+        0.0
+    };
+
     let total_width = (pattern.len() as f64 * module_width) + (2.0 * margin);
     let total_height = height + text_height + (2.0 * margin);
-    
+
     let mut document = Document::new()
         .set("width", total_width)
         .set("height", total_height)
         .set("viewBox", (0, 0, total_width as i32, total_height as i32))
         .set("xmlns", "http://www.w3.org/2000/svg");
-    
+
     // White background
     let background = Rectangle::new()
         .set("width", "100%")
         .set("height", "100%")
         .set("fill", "white");
     document = document.add(background);
-    
+
     // Draw barcode bars
     let mut x = margin;
     for &is_black in pattern {
@@ -49,12 +53,12 @@ fn export_linear_svg(barcode: &Barcode, pattern: &[bool]) -> Result<Vec<u8>> {
         }
         x += module_width;
     }
-    
+
     // Add human-readable text if enabled
     if barcode.config.include_text {
         let text_y = margin + height + 15.0;
         let text_x = total_width / 2.0;
-        
+
         let text = Text::new(&barcode.data)
             .set("x", text_x)
             .set("y", text_y)
@@ -64,7 +68,7 @@ fn export_linear_svg(barcode: &Barcode, pattern: &[bool]) -> Result<Vec<u8>> {
             .set("fill", "black");
         document = document.add(text);
     }
-    
+
     // Convert to bytes
     let svg_string = document.to_string();
     Ok(svg_string.into_bytes())
@@ -73,40 +77,42 @@ fn export_linear_svg(barcode: &Barcode, pattern: &[bool]) -> Result<Vec<u8>> {
 /// Export a matrix (2D) barcode to SVG
 fn export_matrix_svg(barcode: &Barcode, matrix: &[Vec<bool>]) -> Result<Vec<u8>> {
     if matrix.is_empty() || matrix[0].is_empty() {
-        return Err(QuickCodesError::ExportError(
-            "Matrix is empty".to_string()
-        ));
+        return Err(QuickCodesError::ExportError("Matrix is empty".to_string()));
     }
-    
+
     let module_size = 4.0; // Size of each module in SVG units
     let margin = barcode.config.margin as f64;
-    let text_height = if barcode.config.include_text { 20.0 } else { 0.0 };
-    
+    let text_height = if barcode.config.include_text {
+        20.0
+    } else {
+        0.0
+    };
+
     let matrix_width = matrix[0].len() as f64 * module_size;
     let matrix_height = matrix.len() as f64 * module_size;
     let total_width = matrix_width + (2.0 * margin);
     let total_height = matrix_height + text_height + (2.0 * margin);
-    
+
     let mut document = Document::new()
         .set("width", total_width)
         .set("height", total_height)
         .set("viewBox", (0, 0, total_width as i32, total_height as i32))
         .set("xmlns", "http://www.w3.org/2000/svg");
-    
+
     // White background
     let background = Rectangle::new()
         .set("width", "100%")
         .set("height", "100%")
         .set("fill", "white");
     document = document.add(background);
-    
+
     // Draw matrix modules
     for (row, row_data) in matrix.iter().enumerate() {
         for (col, &is_black) in row_data.iter().enumerate() {
             if is_black {
                 let x = margin + (col as f64 * module_size);
                 let y = margin + (row as f64 * module_size);
-                
+
                 let module = Rectangle::new()
                     .set("x", x)
                     .set("y", y)
@@ -117,12 +123,12 @@ fn export_matrix_svg(barcode: &Barcode, matrix: &[Vec<bool>]) -> Result<Vec<u8>>
             }
         }
     }
-    
+
     // Add human-readable text if enabled
     if barcode.config.include_text {
         let text_y = margin + matrix_height + 15.0;
         let text_x = total_width / 2.0;
-        
+
         let display_text = match barcode.barcode_type {
             BarcodeType::QRCode => {
                 // For QR codes, truncate long data for display
@@ -134,7 +140,7 @@ fn export_matrix_svg(barcode: &Barcode, matrix: &[Vec<bool>]) -> Result<Vec<u8>>
             }
             _ => barcode.data.clone(),
         };
-        
+
         let text = Text::new(&display_text)
             .set("x", text_x)
             .set("y", text_y)
@@ -144,7 +150,7 @@ fn export_matrix_svg(barcode: &Barcode, matrix: &[Vec<bool>]) -> Result<Vec<u8>>
             .set("fill", "black");
         document = document.add(text);
     }
-    
+
     // Convert to bytes
     let svg_string = document.to_string();
     Ok(svg_string.into_bytes())
@@ -153,15 +159,15 @@ fn export_matrix_svg(barcode: &Barcode, matrix: &[Vec<bool>]) -> Result<Vec<u8>>
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::generators::qr::generate_qr;
     use crate::generators::ean13::generate_ean13;
+    use crate::generators::qr::generate_qr;
 
     #[test]
     fn test_svg_export_qr() {
         let barcode = generate_qr("Test").unwrap();
         let svg_data = export_svg(&barcode);
         assert!(svg_data.is_ok());
-        
+
         let svg_string = String::from_utf8(svg_data.unwrap()).unwrap();
         assert!(svg_string.contains("<svg"));
         assert!(svg_string.contains("</svg>"));
@@ -173,7 +179,7 @@ mod tests {
         let barcode = generate_ean13("123456789012").unwrap();
         let svg_data = export_svg(&barcode);
         assert!(svg_data.is_ok());
-        
+
         let svg_string = String::from_utf8(svg_data.unwrap()).unwrap();
         assert!(svg_string.contains("<svg"));
         assert!(svg_string.contains("</svg>"));

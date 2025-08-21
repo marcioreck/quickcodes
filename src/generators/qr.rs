@@ -1,7 +1,9 @@
 //! QR Code generator
 
-use crate::types::{Barcode, BarcodeConfig, BarcodeModules, BarcodeType, QRErrorCorrection, Result, QuickCodesError};
-use qrcode::{QrCode, EcLevel};
+use crate::types::{
+    Barcode, BarcodeConfig, BarcodeModules, BarcodeType, QRErrorCorrection, QuickCodesError, Result,
+};
+use qrcode::{EcLevel, QrCode};
 
 /// Generate a QR Code with default configuration
 pub fn generate_qr(data: &str) -> Result<Barcode> {
@@ -25,7 +27,7 @@ pub fn generate_qr_with_config(data: &str, config: &BarcodeConfig) -> Result<Bar
     // Convert to our internal representation
     let width = qr_code.width();
     let mut matrix = Vec::with_capacity(width);
-    
+
     for y in 0..width {
         let mut row = Vec::with_capacity(width);
         for x in 0..width {
@@ -51,11 +53,11 @@ mod tests {
     fn test_qr_generation() {
         let result = generate_qr("Hello, World!");
         assert!(result.is_ok());
-        
+
         let barcode = result.unwrap();
         assert_eq!(barcode.barcode_type, BarcodeType::QRCode);
         assert_eq!(barcode.data, "Hello, World!");
-        
+
         match barcode.modules {
             BarcodeModules::Matrix(matrix) => {
                 assert!(!matrix.is_empty());
@@ -70,7 +72,7 @@ mod tests {
     #[test]
     fn test_qr_different_error_corrections() {
         let mut config = BarcodeConfig::default();
-        
+
         // Test all error correction levels
         for ec_level in [
             QRErrorCorrection::Low,
@@ -80,7 +82,11 @@ mod tests {
         ] {
             config.qr_config.error_correction = ec_level;
             let result = generate_qr_with_config("Test data", &config);
-            assert!(result.is_ok(), "Failed with error correction: {:?}", ec_level);
+            assert!(
+                result.is_ok(),
+                "Failed with error correction: {:?}",
+                ec_level
+            );
         }
     }
 
@@ -97,7 +103,7 @@ mod tests {
         // This might fail if data is too large for QR code capacity
         // but we test that it handles the error gracefully
         match result {
-            Ok(_) => (), // Success is fine
+            Ok(_) => (),                                    // Success is fine
             Err(QuickCodesError::GenerationError(_)) => (), // Expected error is fine
             Err(e) => panic!("Unexpected error type: {:?}", e),
         }

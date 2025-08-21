@@ -14,7 +14,7 @@ pub enum BarcodeType {
     Code39,
     ITF14,
     Codabar,
-    
+
     // 2D Codes
     QRCode,
     DataMatrix,
@@ -39,25 +39,20 @@ impl ExportFormat {
             Some("svg") => Ok(ExportFormat::SVG),
             Some("pdf") => Ok(ExportFormat::PDF),
             _ => Err(QuickCodesError::UnsupportedFormat(
-                "Unsupported file extension. Use .png, .svg, or .pdf".to_string()
+                "Unsupported file extension. Use .png, .svg, or .pdf".to_string(),
             )),
         }
     }
 }
 
 /// QR Code error correction levels
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum QRErrorCorrection {
-    Low,      // ~7% recovery
-    Medium,   // ~15% recovery
+    Low, // ~7% recovery
+    #[default]
+    Medium, // ~15% recovery
     Quartile, // ~25% recovery
-    High,     // ~30% recovery
-}
-
-impl Default for QRErrorCorrection {
-    fn default() -> Self {
-        QRErrorCorrection::Medium
-    }
+    High, // ~30% recovery
 }
 
 /// Configuration options for barcode generation
@@ -133,22 +128,22 @@ pub enum BarcodeModules {
 pub enum QuickCodesError {
     #[error("Invalid data: {0}")]
     InvalidData(String),
-    
+
     #[error("Unsupported barcode type: {0:?}")]
     UnsupportedBarcodeType(BarcodeType),
-    
+
     #[error("Unsupported export format: {0}")]
     UnsupportedFormat(String),
-    
+
     #[error("Generation error: {0}")]
     GenerationError(String),
-    
+
     #[error("Export error: {0}")]
     ExportError(String),
-    
+
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
-    
+
     #[error("Image processing error: {0}")]
     ImageError(String),
 }

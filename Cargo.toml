@@ -2,11 +2,11 @@
 name = "quickcodes"
 version = "0.1.0"
 edition = "2021"
-authors = ["QuickCodes Contributors"]
-description = "Universal Barcode & QR Toolkit - Generate and read 1D and 2D codes"
+authors = ["Márcio Reck <marcio@fazmercado.com>"]
+description = "Universal Barcode & QR Toolkit - Generate and read 1D and 2D codes with high performance"
 license = "MIT"
-repository = "https://github.com/seu-usuario/quickcodes"
-homepage = "https://github.com/seu-usuario/quickcodes"
+repository = "https://github.com/marcioreck/quickcodes"
+homepage = "https://github.com/marcioreck/quickcodes"
 documentation = "https://docs.rs/quickcodes"
 keywords = ["barcode", "qrcode", "ean", "code128", "datamatrix"]
 categories = ["encoding", "multimedia::images"]
@@ -56,6 +56,7 @@ python = ["dep:pyo3"]
 
 [dev-dependencies]
 criterion = "0.5"
+tempfile = "3.8"
 
 # Benchmarks will be added later
 # [[bench]]

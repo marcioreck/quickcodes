@@ -26,18 +26,30 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Example 4: Using generate_to_file convenience function
     println!("4. Using generate_to_file for Code128...");
-    generate_to_file(BarcodeType::Code128, "HELLO123", "examples/output/code128_example.svg")?;
+    generate_to_file(
+        BarcodeType::Code128,
+        "HELLO123",
+        "examples/output/code128_example.svg",
+    )?;
     println!("   ✅ Saved to examples/output/code128_example.svg");
 
     // Example 5: Generate QR Code for Pix payment (Brazilian instant payment)
     println!("5. Generating QR Code for Pix payment...");
     let pix_data = "00020126580014BR.GOV.BCB.PIX0114+5551999999995204000053039865405100.005802BR5920Padaria Exemplo6009SAO PAULO62070503***6304ABCD";
-    generate_to_file(BarcodeType::QRCode, pix_data, "examples/output/pix_payment.svg")?;
+    generate_to_file(
+        BarcodeType::QRCode,
+        pix_data,
+        "examples/output/pix_payment.svg",
+    )?;
     println!("   ✅ Saved to examples/output/pix_payment.svg");
 
     // Example 6: Generate QR Code with URL
     println!("6. Generating QR Code with URL...");
-    generate_to_file(BarcodeType::QRCode, "https://github.com/quickcodes/quickcodes", "examples/output/github_url.png")?;
+    generate_to_file(
+        BarcodeType::QRCode,
+        "https://github.com/quickcodes/quickcodes",
+        "examples/output/github_url.png",
+    )?;
     println!("   ✅ Saved to examples/output/github_url.png");
 
     println!("\n🎉 All examples generated successfully!");
