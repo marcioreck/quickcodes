@@ -1,0 +1,18 @@
+# rustfmt.toml - Configuração de formatação para QuickCodes
+# Baseado nas melhores práticas da comunidade Rust (stable channel)
+
+# Configurações básicas (stable)
+edition = "2021"
+max_width = 100
+hard_tabs = false
+tab_spaces = 4
+
+# Imports (stable)
+reorder_imports = true
+
+# Formatação de código (stable)
+newline_style = "Unix"
+use_small_heuristics = "Default"
+
+# Configurações específicas para o projeto
+# Compatível com canal estável do Rust

@@ -1,5 +1,5 @@
 //! Phase 2 Usage Examples
-//! 
+//!
 //! This example demonstrates the new advanced 2D barcode formats
 //! introduced in Phase 2: DataMatrix, PDF417, and Aztec Code.
 
@@ -24,7 +24,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // 2. DataMatrix - Industrial tracking
     println!("🏭 Generating DataMatrix (Industrial)...");
-    let industrial_data = "PART:ABC123|LOT:20240115|SN:001234567";
+    let industrial_data = "PART:ABC123|LOT:20250821|SN:001234567";
     generate_to_file(
         BarcodeType::DataMatrix,
         industrial_data,
@@ -46,8 +46,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("📊 Generating PDF417 (Large Data)...");
     let large_data = format!(
         "INVOICE:INV-{}\nDATE:{}\nCUSTOMER:{}\nAMOUNT:{}\nTAX:{}\nTOTAL:{}\nITEMS:{}",
-        "2024-001234",
-        "2024-01-15T10:30:00Z",
+        "2025-001234",
+        "2025-08-21T10:30:00Z",
         "Acme Corporation Ltd, 123 Business St, Business City, BC 12345",
         "1,250.00",
         "187.50",
@@ -63,7 +63,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // 5. Aztec - Transport ticket
     println!("🚌 Generating Aztec (Transport)...");
-    let ticket_data = "TKT:A12345|FROM:NYC Penn Station|TO:Boston South|DATE:2024-01-15|TIME:14:30|SEAT:12A|PRICE:89.50";
+    let ticket_data = "TKT:A12345|FROM:NYC Penn Station|TO:Boston South|DATE:2025-08-21|TIME:14:30|SEAT:12A|PRICE:89.50";
     generate_to_file(
         BarcodeType::Aztec,
         ticket_data,
@@ -73,7 +73,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // 6. Aztec - Event ticket
     println!("🎫 Generating Aztec (Event)...");
-    let event_data = "EVENT:Rock Concert 2024|VENUE:Madison Square Garden|DATE:2024-03-15|TIME:20:00|SECTION:A|ROW:12|SEAT:15|PRICE:125.00|GATE:B";
+    let event_data = "EVENT:Rock Concert 2025|VENUE:Madison Square Garden|DATE:2025-08-21|TIME:20:00|SECTION:A|ROW:12|SEAT:15|PRICE:125.00|GATE:B";
     generate_to_file(
         BarcodeType::Aztec,
         event_data,

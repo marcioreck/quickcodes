@@ -31,22 +31,33 @@
 ### Python
 
 ```python
-from quickcodes import generate_to_file
-import quickcodes as qc
+from quickcodes import generate_to_file, read_from_file, read_all_from_file
 
+# 🔧 GERAÇÃO DE CÓDIGOS
 # Gerar QR Code de pagamento Pix
-generate_to_file("QRCode", "00020126580014BR.GOV.BCB.PIX0114+5551999999995204000053039865405100.005802BR5920Padaria Exemplo6009SAO PAULO62070503***6304ABCD", "pix.svg")
+generate_to_file("QRCode", "00020126580014BR.GOV.BCB.PIX0114+5551999999995204000053039865405100.005802BR5920Padaria Exemplo6009SAO PAULO62070503***6304ABCD", "pix.pdf")
 
 # Gerar DataMatrix para rastreamento farmacêutico (ANVISA)
-generate_to_file("DataMatrix", "010123456789012815240101", "pharma.svg")
+generate_to_file("DataMatrix", "010123456789012815240101", "pharma.png")
 
 # Gerar PDF417 para documentos oficiais
 generate_to_file("PDF417", "DRIVER LICENSE|DOE,JOHN|DOB:1990-01-01", "document.svg")
 
 # Gerar Aztec para tickets de transporte
-generate_to_file("Aztec", "TKT:12345|FROM:NYC|TO:BOS|DATE:2024-01-15", "ticket.svg")
+generate_to_file("Aztec", "TKT:12345|FROM:NYC|TO:BOS|DATE:2025-08-21", "ticket.pdf")
 
-# Formatos disponíveis: QRCode, EAN13, UPCA, Code128, DataMatrix, PDF417, Aztec
+# 📖 LEITURA DE CÓDIGOS
+# Ler primeiro código encontrado
+result = read_from_file("barcode_image.png")
+print(f"Tipo: {result['barcode_type']}, Dados: {result['data']}")
+
+# Ler todos os códigos na imagem
+results = read_all_from_file("multiple_barcodes.jpg")
+for i, code in enumerate(results):
+    print(f"Código {i+1}: {code['barcode_type']} = {code['data']}")
+
+# Formatos: QRCode, EAN13, UPCA, Code128, DataMatrix, PDF417, Aztec
+# Exportação: SVG, PNG, PDF
 ```
 
 ### JavaScript (Browser) *[Planejado - WASM em desenvolvimento]*
@@ -64,7 +75,7 @@ let datamatrix = generate("DataMatrix", "010123456789012815240101");
 let pdf417 = generate("PDF417", "DRIVER LICENSE|DOE,JOHN|1990-01-01");
 
 // Gerar Aztec para tickets
-let aztec = generate("Aztec", "TKT:12345|FROM:NYC|TO:BOS");
+let aztec = generate("Aztec", "TKT:12345|FROM:NYC|TO:BOS|DATE:2025-08-21");
 ```
 
 ### 📸 Exemplos Gerados
@@ -92,18 +103,25 @@ Após executar os exemplos, você encontrará estes arquivos em `examples/output
 
 ## 🎯 Status Atual
 
-✅ **Fase 2 - Códigos 2D Avançados Implementados!**
+✅ **Fase 2 COMPLETA - Expansão Industrial Finalizada!**
 
-- ✅ 7 formatos de código implementados (QR, EAN-13, UPC-A, Code128, DataMatrix, PDF417, Aztec)
-- ✅ 2 formatos de exportação (SVG, PNG)
-- ✅ 56 testes passando (41 unitários + 12 integração + 3 doctests)
-- ✅ API unificada Rust e Python para todos os formatos
-- ✅ Bindings Python com PyO3 atualizados
-- ✅ Código 100% limpo (0 warnings, clippy aprovado)
-- ✅ Exemplos funcionais da Fase 2 e documentação completa
-- ✅ Suporte completo para casos de uso farmacêuticos (DataMatrix/ANVISA)
-- ✅ Suporte para documentos oficiais (PDF417)
-- ✅ Suporte para tickets de transporte (Aztec)
+**📊 Funcionalidades Implementadas:**
+- ✅ **7 formatos de código**: QR, EAN-13, UPC-A, Code128, DataMatrix, PDF417, Aztec
+- ✅ **3 formatos de exportação**: SVG, PNG, PDF
+- ✅ **Sistema de leitura completo**: Detecção automática, múltiplos códigos, confiança
+- ✅ **68 testes passando**: 51 unitários + 12 integração + 5 doctests
+- ✅ **API unificada**: Rust nativo + Python para geração E leitura
+- ✅ **Bindings Python completos**: Geração, leitura, PDF
+- ✅ **Código 100% limpo**: 0 warnings, clippy aprovado
+- ✅ **Documentação completa**: Exemplos funcionais das 2 fases
+
+**🏭 Casos de Uso Industriais:**
+- ✅ **Farmacêutico**: DataMatrix para rastreabilidade ANVISA
+- ✅ **Documentos**: PDF417 para carteiras e identificações
+- ✅ **Transporte**: Aztec para tickets e bilhetes
+- ✅ **Varejo**: EAN-13/UPC-A para produtos
+- ✅ **Mobile**: QR Code para aplicações
+- ✅ **Logística**: Code128 para rastreamento
 
 ```bash
 # Teste a biblioteca agora:
@@ -142,20 +160,20 @@ cargo run --example phase2_usage
   * [x] Python (PyO3) - Implementado e testado
   * [ ] JavaScript/Node.js (NAPI-RS) [postergado para realizar após API estar completa, toda a fase 2]
 
-### 🔧 **Fase 2 - Expansão Industrial** ⚡ EM PROGRESSO
+### 🔧 **Fase 2 - Expansão Industrial** ✅ CONCLUÍDA
 * [x] **Códigos 2D Avançados** ✅ CONCLUÍDO
   * [x] DataMatrix (farmacêutica/ANVISA)
   * [x] PDF417 (documentos oficiais)
   * [x] Aztec Code (transporte)
-* [ ] **Leitura/Decodificação**
-  * [ ] Leitor de imagens estáticas
-  * [ ] Algoritmos de detecção e correção
-  * [ ] Suporte a múltiplos códigos por imagem
-* [ ] **Exportação Avançada**
-  * [ ] PDF nativo
-  * [ ] Canvas/HTML5 integration
-  * [ ] Batch processing
-* [ ] **WebAssembly**
+* [x] **Leitura/Decodificação** ✅ CONCLUÍDO
+  * [x] Leitor de imagens estáticas
+  * [x] Algoritmos de detecção e correção
+  * [x] Suporte a múltiplos códigos por imagem
+* [x] **Exportação Avançada** ✅ CONCLUÍDO
+  * [x] PDF nativo
+  * [ ] Canvas/HTML5 integration [movido para Fase 3]
+  * [ ] Batch processing [movido para Fase 3]
+* [ ] **WebAssembly** [movido para Fase 3]
   * [ ] Build WASM otimizado
   * [ ] API JavaScript para browser
   * [ ] Leitura de webcam em tempo real

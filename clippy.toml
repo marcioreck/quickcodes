@@ -1,0 +1,33 @@
+# clippy.toml - Configuração de linting para QuickCodes
+# Baseado nas recomendações do Copilot e melhores práticas
+
+# Limites de complexidade
+cognitive-complexity-threshold = 25
+type-complexity-threshold = 100
+too-many-arguments-threshold = 8
+too-many-lines-threshold = 100
+
+# Limites de aninhamento
+excessive-nesting-threshold = 6
+
+# Configurações de performance
+trivial-copy-size-limit = 128
+
+# Configurações de estilo
+enum-variant-name-threshold = 3
+single-char-binding-names-threshold = 4
+
+# Configurações específicas do projeto
+# Permitir algumas práticas comuns em bibliotecas de geração de códigos
+avoid-breaking-exported-api = true
+msrv = "1.70.0"
+
+# Configurações para documentação
+doc-valid-idents = [
+    "QRCode", "EAN13", "UPCA", "Code128", 
+    "DataMatrix", "PDF417", "Aztec",
+    "ANVISA", "GS1", "PyO3", "NAPI",
+    "SVG", "PNG", "PDF", "WASM",
+    "API", "CLI", "REST", "HTTP",
+    "UTF8", "Unicode", "ASCII"
+]
