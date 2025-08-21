@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["generate_aztec","generate_aztec_with_config"],"struct":["AztecConfig"]};

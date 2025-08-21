@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["generate_datamatrix","generate_datamatrix_with_config"]};
