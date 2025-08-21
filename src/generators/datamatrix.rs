@@ -1,14 +1,12 @@
 //! DataMatrix barcode generator
-//! 
+//!
 //! DataMatrix is a 2D barcode commonly used in pharmaceutical and industrial applications.
 //! It's particularly important for ANVISA compliance in Brazil.
-//! 
+//!
 //! This is a simplified implementation for demonstration purposes.
 //! A production implementation would use proper DataMatrix encoding algorithms.
 
-use crate::types::{
-    Barcode, BarcodeConfig, BarcodeModules, BarcodeType, QuickCodesError, Result,
-};
+use crate::types::{Barcode, BarcodeConfig, BarcodeModules, BarcodeType, QuickCodesError, Result};
 
 /// Generate a DataMatrix with default configuration
 pub fn generate_datamatrix(data: &str) -> Result<Barcode> {
@@ -46,7 +44,7 @@ fn generate_datamatrix_pattern(data: &str) -> Result<Vec<Vec<bool>>> {
     // 4. Module placement algorithm
 
     let data_bytes = data.as_bytes();
-    
+
     // Calculate size based on data length (simplified)
     let size = calculate_datamatrix_size(data_bytes.len());
     let mut matrix = vec![vec![false; size]; size];
@@ -84,17 +82,17 @@ fn generate_finder_patterns(matrix: &mut [Vec<bool>], size: usize) {
     for y in 0..size {
         matrix[y][0] = true;
     }
-    
+
     // Bottom border (solid line)
     for x in 0..size {
         matrix[size - 1][x] = true;
     }
-    
+
     // Top border (alternating pattern)
     for x in (0..size).step_by(2) {
         matrix[0][x] = true;
     }
-    
+
     // Right border (alternating pattern)
     for y in (1..size).step_by(2) {
         matrix[y][size - 1] = true;
@@ -105,18 +103,18 @@ fn generate_finder_patterns(matrix: &mut [Vec<bool>], size: usize) {
 fn fill_data_area(matrix: &mut [Vec<bool>], data: &[u8], size: usize) {
     let mut bit_index = 0;
     let total_bits = data.len() * 8;
-    
+
     // Fill in a diagonal pattern (simplified placement algorithm)
     for diagonal in 0..(size * 2) {
         for i in 0..=diagonal {
             let x = i;
             let y = diagonal - i;
-            
+
             if x < size && y < size && x > 0 && y > 0 && x < size - 1 && y < size - 1 {
                 if bit_index < total_bits {
                     let byte_idx = bit_index / 8;
                     let bit_pos = 7 - (bit_index % 8);
-                    
+
                     if byte_idx < data.len() {
                         matrix[y][x] = (data[byte_idx] >> bit_pos) & 1 == 1;
                         bit_index += 1;

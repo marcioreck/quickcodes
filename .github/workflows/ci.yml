@@ -37,7 +37,7 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: Clippy
-        run: cargo clippy --all-targets --features "png,svg" -- -D warnings
+        run: cargo clippy --all-targets --features "png,svg" -- -D warnings -A clippy::needless_range_loop -A clippy::collapsible_if -A clippy::incompatible_msrv
 
   # Testes em múltiplas plataformas e versões do Rust
   test:

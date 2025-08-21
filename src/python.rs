@@ -173,7 +173,7 @@ fn generate(
         "EAN13" => BarcodeType::EAN13,
         "UPCA" => BarcodeType::UPCA,
         "Code128" => BarcodeType::Code128,
-        
+
         // Phase 2: Advanced 2D codes
         "DataMatrix" => BarcodeType::DataMatrix,
         "PDF417" => BarcodeType::PDF417,
@@ -235,7 +235,7 @@ fn generate_to_file(barcode_type: &str, data: &str, output_path: &str) -> PyResu
         "EAN13" => BarcodeType::EAN13,
         "UPCA" => BarcodeType::UPCA,
         "Code128" => BarcodeType::Code128,
-        
+
         // Phase 2: Advanced 2D codes
         "DataMatrix" => BarcodeType::DataMatrix,
         "PDF417" => BarcodeType::PDF417,
@@ -276,7 +276,7 @@ fn quickcodes(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add("EAN13", "EAN13")?;
     m.add("UPC_A", "UPCA")?;
     m.add("CODE128", "Code128")?;
-    
+
     // Phase 2: Advanced 2D codes
     m.add("DATA_MATRIX", "DataMatrix")?;
     m.add("PDF417", "PDF417")?;

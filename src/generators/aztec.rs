@@ -1,11 +1,9 @@
 //! Aztec Code generator
-//! 
+//!
 //! Aztec Code is a 2D barcode commonly used in transportation tickets,
 //! particularly in Europe and for mobile ticketing applications.
 
-use crate::types::{
-    Barcode, BarcodeConfig, BarcodeModules, BarcodeType, QuickCodesError, Result,
-};
+use crate::types::{Barcode, BarcodeConfig, BarcodeModules, BarcodeType, QuickCodesError, Result};
 
 /// Aztec Code configuration options
 #[derive(Debug, Clone)]
@@ -23,7 +21,7 @@ impl Default for AztecConfig {
         Self {
             compact: false,
             error_correction: 23, // ~23% error correction
-            layers: None, // Auto-select
+            layers: None,         // Auto-select
         }
     }
 }
@@ -62,7 +60,9 @@ fn generate_aztec_matrix(data: &str, config: &AztecConfig) -> Result<Vec<Vec<boo
     // 4. Reference grid and orientation patterns
 
     let data_bytes = data.as_bytes();
-    let layers = config.layers.unwrap_or_else(|| calculate_layers(data_bytes.len(), config.compact));
+    let layers = config
+        .layers
+        .unwrap_or_else(|| calculate_layers(data_bytes.len(), config.compact));
     let size = if config.compact {
         11 + 4 * layers as usize // Compact: 15x15 to 27x27
     } else {
@@ -88,13 +88,13 @@ fn generate_aztec_matrix(data: &str, config: &AztecConfig) -> Result<Vec<Vec<boo
 /// Generate the central finder pattern (bullseye)
 fn generate_finder_pattern(matrix: &mut [Vec<bool>], size: usize) {
     let center = size / 2;
-    
+
     // Create concentric squares (simplified bullseye pattern)
     for ring in 0..=5 {
         let is_filled = ring % 2 == 1;
         let start = center.saturating_sub(ring);
         let end = (center + ring + 1).min(size);
-        
+
         for y in start..end {
             for x in start..end {
                 if y == start || y == end - 1 || x == start || x == end - 1 {
@@ -124,31 +124,31 @@ fn generate_reference_grid(matrix: &mut [Vec<bool>], size: usize) {
 fn encode_data_spiral(matrix: &mut [Vec<bool>], data: &[u8], size: usize, compact: bool) {
     let start_radius = if compact { 6 } else { 8 };
     let center = size / 2;
-    
+
     let mut bit_index = 0;
     let total_bits = data.len() * 8;
-    
+
     // Spiral outward from center
     for radius in start_radius..center {
         let positions = get_spiral_positions(center, radius, size);
-        
+
         for (x, y) in positions {
             if bit_index >= total_bits {
                 break;
             }
-            
+
             // Skip finder pattern and reference grid positions
             if is_data_position(x, y, center, compact) {
                 let byte_idx = bit_index / 8;
                 let bit_pos = 7 - (bit_index % 8);
-                
+
                 if byte_idx < data.len() {
                     matrix[y][x] = (data[byte_idx] >> bit_pos) & 1 == 1;
                     bit_index += 1;
                 }
             }
         }
-        
+
         if bit_index >= total_bits {
             break;
         }
@@ -160,21 +160,21 @@ fn get_spiral_positions(center: usize, radius: usize, size: usize) -> Vec<(usize
     let mut positions = Vec::new();
     let start = center.saturating_sub(radius);
     let end = (center + radius + 1).min(size);
-    
+
     // Top row
     for x in start..end {
         if start < size {
             positions.push((x, start));
         }
     }
-    
+
     // Right column
     for y in (start + 1)..end {
         if end > 0 && end - 1 < size && y < size {
             positions.push((end - 1, y));
         }
     }
-    
+
     // Bottom row (if different from top)
     if end > start + 1 {
         for x in (start..(end - 1)).rev() {
@@ -183,7 +183,7 @@ fn get_spiral_positions(center: usize, radius: usize, size: usize) -> Vec<(usize
             }
         }
     }
-    
+
     // Left column (if different from right)
     if end > start + 1 {
         for y in ((start + 1)..(end - 1)).rev() {
@@ -192,25 +192,25 @@ fn get_spiral_positions(center: usize, radius: usize, size: usize) -> Vec<(usize
             }
         }
     }
-    
+
     positions
 }
 
 /// Check if position is available for data (not finder pattern or reference grid)
 fn is_data_position(x: usize, y: usize, center: usize, compact: bool) -> bool {
-    let dx = (x as i32 - center as i32).abs() as usize;
-    let dy = (y as i32 - center as i32).abs() as usize;
-    
+    let dx = (x as i32 - center as i32).unsigned_abs();
+    let dy = (y as i32 - center as i32).unsigned_abs();
+
     // Skip finder pattern area
     if dx <= 5 && dy <= 5 {
         return false;
     }
-    
+
     // Skip reference grid for full format
     if !compact && (x % 16 == 0 || y % 16 == 0) {
         return false;
     }
-    
+
     true
 }
 
@@ -219,7 +219,7 @@ fn calculate_layers(data_len: usize, compact: bool) -> u8 {
     // Simplified calculation - real Aztec uses complex capacity tables
     let bits_needed = data_len * 8;
     let max_layers = if compact { 4 } else { 32 };
-    
+
     for layer in 1..=max_layers {
         let capacity = if compact {
             // Compact capacity approximation
@@ -228,12 +228,12 @@ fn calculate_layers(data_len: usize, compact: bool) -> u8 {
             // Full capacity approximation
             layer as usize * 256 // Rough estimate
         };
-        
+
         if capacity >= bits_needed {
             return layer;
         }
     }
-    
+
     max_layers
 }
 
@@ -287,19 +287,35 @@ mod tests {
         let result2 = calculate_layers(100, true);
         let result3 = calculate_layers(10, false);
         let result4 = calculate_layers(1000, false);
-        
+
         // Verify they are within valid ranges
-        assert!(result1 >= 1 && result1 <= 4, "Compact layers should be 1-4, got {}", result1);
-        assert!(result2 >= 1 && result2 <= 4, "Compact layers should be 1-4, got {}", result2);
-        assert!(result3 >= 1 && result3 <= 32, "Full layers should be 1-32, got {}", result3);
-        assert!(result4 >= 1 && result4 <= 32, "Full layers should be 1-32, got {}", result4);
+        assert!(
+            (1..=4).contains(&result1),
+            "Compact layers should be 1-4, got {}",
+            result1
+        );
+        assert!(
+            (1..=4).contains(&result2),
+            "Compact layers should be 1-4, got {}",
+            result2
+        );
+        assert!(
+            (1..=32).contains(&result3),
+            "Full layers should be 1-32, got {}",
+            result3
+        );
+        assert!(
+            (1..=32).contains(&result4),
+            "Full layers should be 1-32, got {}",
+            result4
+        );
     }
 
     #[test]
     fn test_finder_pattern() {
         let mut matrix = vec![vec![false; 21]; 21];
         generate_finder_pattern(&mut matrix, 21);
-        
+
         // Check that center has some pattern
         let center = 10;
         let mut has_pattern = false;
@@ -311,6 +327,9 @@ mod tests {
                 }
             }
         }
-        assert!(has_pattern, "Finder pattern should have some filled modules");
+        assert!(
+            has_pattern,
+            "Finder pattern should have some filled modules"
+        );
     }
 }
