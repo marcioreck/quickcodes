@@ -153,7 +153,6 @@ mod integration_tests {
             "tel:+5511999999999",
             "WIFI:T:WPA;S:NetworkName;P:password123;;",
             "00020126580014BR.GOV.BCB.PIX0114+5551999999995204000053039865402BR5909Test User6009SAO PAULO62070503***6304ABCD", // Pix
-            "", // Empty string
         ];
 
         for data in test_cases {
@@ -164,6 +163,11 @@ mod integration_tests {
                 data
             );
         }
+
+        // Empty string should fail
+        let result = generate(BarcodeType::QRCode, "", ExportFormat::SVG);
+        assert!(result.is_err(), "Empty string should not be accepted");
+        assert!(result.unwrap_err().to_string().contains("empty"));
     }
 
     /// Test invalid input handling

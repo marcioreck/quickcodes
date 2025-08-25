@@ -14,7 +14,7 @@ readme = "README.md"
 
 [lib]
 name = "quickcodes"
-crate-type = ["cdylib", "rlib"]
+crate-type = ["cdylib", "rlib", "staticlib"]
 
 # CLI will be added in Phase 1
 # [[bin]]

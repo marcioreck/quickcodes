@@ -1,0 +1,13 @@
+/home/marcioreck/dev/quickcodes/dotnet/QuickCodes/bin/Debug/net8.0/libquickcodes.so
+/home/marcioreck/dev/quickcodes/dotnet/QuickCodes/bin/Debug/net8.0/QuickCodes.deps.json
+/home/marcioreck/dev/quickcodes/dotnet/QuickCodes/bin/Debug/net8.0/QuickCodes.dll
+/home/marcioreck/dev/quickcodes/dotnet/QuickCodes/bin/Debug/net8.0/QuickCodes.pdb
+/home/marcioreck/dev/quickcodes/dotnet/QuickCodes/obj/Debug/net8.0/QuickCodes.GeneratedMSBuildEditorConfig.editorconfig
+/home/marcioreck/dev/quickcodes/dotnet/QuickCodes/obj/Debug/net8.0/QuickCodes.AssemblyInfoInputs.cache
+/home/marcioreck/dev/quickcodes/dotnet/QuickCodes/obj/Debug/net8.0/QuickCodes.AssemblyInfo.cs
+/home/marcioreck/dev/quickcodes/dotnet/QuickCodes/obj/Debug/net8.0/QuickCodes.csproj.CoreCompileInputs.cache
+/home/marcioreck/dev/quickcodes/dotnet/QuickCodes/obj/Debug/net8.0/QuickCodes.sourcelink.json
+/home/marcioreck/dev/quickcodes/dotnet/QuickCodes/obj/Debug/net8.0/QuickCodes.dll
+/home/marcioreck/dev/quickcodes/dotnet/QuickCodes/obj/Debug/net8.0/refint/QuickCodes.dll
+/home/marcioreck/dev/quickcodes/dotnet/QuickCodes/obj/Debug/net8.0/QuickCodes.pdb
+/home/marcioreck/dev/quickcodes/dotnet/QuickCodes/obj/Debug/net8.0/ref/QuickCodes.dll

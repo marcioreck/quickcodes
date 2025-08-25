@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/test_quickcodes.dir/test/test.cpp.o -o test_quickcodes   -L/usr/local/lib  -Wl,-rpath,/usr/local/lib -lquickcodes 

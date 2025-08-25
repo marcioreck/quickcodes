@@ -1,29 +1,4 @@
-//! # QuickCodes
-//!
-//! Universal Barcode & QR Toolkit for generating and reading 1D and 2D codes.
-//!
-//! ## Features
-//!
-//! - Generate and read multiple barcode formats (EAN-13, UPC-A, Code128, QR Code, DataMatrix, PDF417, Aztec)
-//! - Export to PNG, SVG, PDF formats
-//! - High performance Rust core
-//! - Cross-platform support
-//!
-//! ## Quick Start
-//!
-//! ```rust
-//! use quickcodes::{generate, BarcodeType, ExportFormat};
-//!
-//! fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     // Generate a QR Code
-//!     let qr_svg = generate(BarcodeType::QRCode, "Hello, World!", ExportFormat::SVG)?;
-//!
-//!     // Generate an EAN-13 barcode
-//!     let ean_png = generate(BarcodeType::EAN13, "123456789012", ExportFormat::PNG)?;
-//!     
-//!     Ok(())
-//! }
-//! ```
+use anyhow::Result as AnyhowResult;
 
 pub mod exporters;
 pub mod generators;
@@ -33,13 +8,14 @@ pub mod types;
 #[cfg(feature = "python")]
 pub mod python;
 
+// C API for language bindings
+mod c_api;
+
 // Re-export public API
 pub use exporters::*;
 pub use generators::*;
-pub use readers::*;
-pub use types::*;
-
-use anyhow::Result as AnyhowResult;
+pub use readers::{read_from_file as readers_read_from_file, read_from_bytes as readers_read_from_bytes};
+pub use types::{BarcodeType, ExportFormat, QuickCodesError, ReadResult, Result};
 
 /// Main generation function - unified API for all barcode types
 ///
@@ -73,6 +49,10 @@ pub fn generate(
     data: &str,
     format: ExportFormat,
 ) -> AnyhowResult<Vec<u8>> {
+    if data.is_empty() {
+        return Err(anyhow::anyhow!("Data cannot be empty"));
+    }
+
     let barcode = match barcode_type {
         // Phase 1: Core formats
         BarcodeType::QRCode => generators::qr::generate_qr(data)?,
@@ -177,10 +157,10 @@ pub fn generate_to_file(
 /// // let result = read_from_file("barcode.png")?;
 /// // println!("Found {}: {}", result.barcode_type, result.data);
 /// ```
-pub fn read_from_file<P: AsRef<std::path::Path>>(image_path: P) -> AnyhowResult<ReadResult> {
+pub fn read_from_file<P: AsRef<std::path::Path>>(_image_path: P) -> AnyhowResult<ReadResult> {
     #[cfg(feature = "readers")]
     {
-        Ok(readers::read_from_file(image_path)?)
+        Ok(readers_read_from_file(_image_path)?)
     }
 
     #[cfg(not(feature = "readers"))]
@@ -203,11 +183,11 @@ pub fn read_from_file<P: AsRef<std::path::Path>>(image_path: P) -> AnyhowResult<
 ///
 /// Returns a vector of all decoded barcodes
 pub fn read_all_from_file<P: AsRef<std::path::Path>>(
-    image_path: P,
+    _image_path: P,
 ) -> AnyhowResult<Vec<ReadResult>> {
     #[cfg(feature = "readers")]
     {
-        Ok(readers::read_all_from_file(image_path)?)
+        Ok(readers::read_all_from_file(_image_path)?)
     }
 
     #[cfg(not(feature = "readers"))]
@@ -228,10 +208,10 @@ pub fn read_all_from_file<P: AsRef<std::path::Path>>(
 /// # Returns
 ///
 /// Returns the first decoded barcode
-pub fn read_from_bytes(image_data: &[u8], format: Option<&str>) -> AnyhowResult<ReadResult> {
+pub fn read_from_bytes(_image_data: &[u8], _format: Option<&str>) -> AnyhowResult<ReadResult> {
     #[cfg(feature = "readers")]
     {
-        Ok(readers::read_from_bytes(image_data, format)?)
+        Ok(readers_read_from_bytes(_image_data, _format)?)
     }
 
     #[cfg(not(feature = "readers"))]

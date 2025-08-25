@@ -1,8 +1,7 @@
-//! Core types and data structures for QuickCodes
-
-use serde::{Deserialize, Serialize};
 use std::path::Path;
+use std::str::FromStr;
 use thiserror::Error;
+use serde::{Serialize, Deserialize};
 
 /// Supported barcode types
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -15,15 +14,41 @@ pub enum BarcodeType {
     ITF14,
     Codabar,
 
-    // 2D Codes
+    // 2D Barcodes
     QRCode,
     DataMatrix,
     PDF417,
     Aztec,
 }
 
-/// Export formats supported by QuickCodes
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Error)]
+pub enum BarcodeTypeParseError {
+    #[error("Invalid barcode type: {0}")]
+    InvalidType(String),
+}
+
+impl FromStr for BarcodeType {
+    type Err = BarcodeTypeParseError;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        match s {
+            "QRCode" => Ok(BarcodeType::QRCode),
+            "EAN13" => Ok(BarcodeType::EAN13),
+            "UPCA" => Ok(BarcodeType::UPCA),
+            "Code128" => Ok(BarcodeType::Code128),
+            "Code39" => Ok(BarcodeType::Code39),
+            "DataMatrix" => Ok(BarcodeType::DataMatrix),
+            "PDF417" => Ok(BarcodeType::PDF417),
+            "Aztec" => Ok(BarcodeType::Aztec),
+            "ITF14" => Ok(BarcodeType::ITF14),
+            "Codabar" => Ok(BarcodeType::Codabar),
+            _ => Err(BarcodeTypeParseError::InvalidType(s.to_string())),
+        }
+    }
+}
+
+/// Export formats supported by the library
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExportFormat {
     PNG,
     SVG,
@@ -31,109 +56,147 @@ pub enum ExportFormat {
 }
 
 impl ExportFormat {
-    /// Determine export format from file extension
-    pub fn from_extension(path: &str) -> Result<Self> {
-        let path = Path::new(path);
-        match path.extension().and_then(|ext| ext.to_str()) {
-            Some("png") => Ok(ExportFormat::PNG),
-            Some("svg") => Ok(ExportFormat::SVG),
-            Some("pdf") => Ok(ExportFormat::PDF),
-            _ => Err(QuickCodesError::UnsupportedFormat(
-                "Unsupported file extension. Use .png, .svg, or .pdf".to_string(),
-            )),
+    pub fn from_extension(path: &str) -> anyhow::Result<Self> {
+        let ext = Path::new(path)
+            .extension()
+            .and_then(|s| s.to_str())
+            .ok_or_else(|| anyhow::anyhow!("File has no extension"))?
+            .to_lowercase();
+
+        match ext.as_str() {
+            "png" => Ok(ExportFormat::PNG),
+            "svg" => Ok(ExportFormat::SVG),
+            "pdf" => Ok(ExportFormat::PDF),
+            _ => Err(anyhow::anyhow!("Unsupported file format: {}", ext)),
         }
     }
 }
 
-/// QR Code error correction levels
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
-pub enum QRErrorCorrection {
-    Low, // ~7% recovery
-    #[default]
-    Medium, // ~15% recovery
-    Quartile, // ~25% recovery
-    High, // ~30% recovery
-}
-
-/// Configuration options for barcode generation
-#[derive(Debug, Clone, Serialize, Deserialize)]
+/// Configuration for barcode generation
+#[derive(Debug, Clone)]
 pub struct BarcodeConfig {
-    /// Width of the barcode in pixels (for raster formats)
-    pub width: Option<u32>,
-    /// Height of the barcode in pixels (for raster formats)
-    pub height: Option<u32>,
-    /// DPI for high-quality output
-    pub dpi: Option<u32>,
-    /// QR Code specific configuration
-    pub qr_config: QRConfig,
-    /// Whether to include human-readable text
-    pub include_text: bool,
-    /// Margin/quiet zone size
+    pub width: u32,
+    pub height: u32,
     pub margin: u32,
+    pub foreground: [u8; 4],
+    pub background: [u8; 4],
+    pub include_text: bool,
+    pub qr_config: QRConfig,
 }
 
 impl Default for BarcodeConfig {
     fn default() -> Self {
         Self {
-            width: None,
-            height: None,
-            dpi: Some(300),
-            qr_config: QRConfig::default(),
-            include_text: true,
+            width: 300,
+            height: 150,
             margin: 10,
+            foreground: [0, 0, 0, 255],
+            background: [255, 255, 255, 255],
+            include_text: true,
+            qr_config: QRConfig::default(),
         }
     }
 }
 
 /// QR Code specific configuration
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct QRConfig {
     pub error_correction: QRErrorCorrection,
-    pub version: Option<u8>, // 1-40, None for auto
 }
 
 impl Default for QRConfig {
     fn default() -> Self {
         Self {
             error_correction: QRErrorCorrection::Medium,
-            version: None,
         }
     }
+}
+
+/// QR Code error correction levels
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum QRErrorCorrection {
+    Low,
+    Medium,
+    Quartile,
+    High,
 }
 
 /// Internal representation of a barcode
 #[derive(Debug, Clone)]
 pub struct Barcode {
-    /// The type of barcode
     pub barcode_type: BarcodeType,
-    /// Original data that was encoded
     pub data: String,
-    /// 2D matrix representation (for 2D codes) or 1D pattern (for 1D codes)
     pub modules: BarcodeModules,
-    /// Configuration used to generate this barcode
     pub config: BarcodeConfig,
 }
 
-/// Module representation for different barcode types
+/// Matrix of modules (pixels) that make up a barcode
 #[derive(Debug, Clone)]
 pub enum BarcodeModules {
-    /// 1D barcode as a series of bars (true = black bar, false = white space)
     Linear(Vec<bool>),
-    /// 2D barcode as a matrix (true = black module, false = white module)
     Matrix(Vec<Vec<bool>>),
 }
 
-/// Errors that can occur during barcode generation or processing
-#[derive(Error, Debug)]
+impl BarcodeModules {
+    pub fn new_linear(width: usize) -> Self {
+        BarcodeModules::Linear(vec![false; width])
+    }
+
+    pub fn new_matrix(width: usize, height: usize) -> Self {
+        BarcodeModules::Matrix(vec![vec![false; width]; height])
+    }
+
+    pub fn get(&self, x: usize, y: usize) -> bool {
+        match self {
+            BarcodeModules::Linear(data) => {
+                if x < data.len() && y == 0 {
+                    data[x]
+                } else {
+                    false
+                }
+            }
+            BarcodeModules::Matrix(data) => {
+                if y < data.len() && x < data[0].len() {
+                    data[y][x]
+                } else {
+                    false
+                }
+            }
+        }
+    }
+
+    pub fn set(&mut self, x: usize, y: usize, value: bool) {
+        match self {
+            BarcodeModules::Linear(data) => {
+                if x < data.len() && y == 0 {
+                    data[x] = value;
+                }
+            }
+            BarcodeModules::Matrix(data) => {
+                if y < data.len() && x < data[0].len() {
+                    data[y][x] = value;
+                }
+            }
+        }
+    }
+}
+
+/// Result of reading a barcode from an image
+#[derive(Debug, Clone, PartialEq)]
+pub struct ReadResult {
+    pub barcode_type: BarcodeType,
+    pub data: String,
+    pub confidence: f32,
+}
+
+/// Error types for the library
+#[derive(Debug, Error)]
 pub enum QuickCodesError {
-    #[error("Invalid data: {0}")]
+    #[error("Invalid barcode data: {0}")]
     InvalidData(String),
 
-    #[error("Unsupported barcode type: {0:?}")]
-    UnsupportedBarcodeType(BarcodeType),
-
-    #[error("Unsupported export format: {0}")]
-    UnsupportedFormat(String),
+    #[error("Invalid barcode type: {0}")]
+    InvalidType(String),
 
     #[error("Generation error: {0}")]
     GenerationError(String),
@@ -141,12 +204,17 @@ pub enum QuickCodesError {
     #[error("Export error: {0}")]
     ExportError(String),
 
+    #[error("Reader error: {0}")]
+    ReaderError(String),
+
+    #[error("Unsupported format: {0}")]
+    UnsupportedFormat(String),
+
+    #[error("Image error: {0}")]
+    ImageError(String),
+
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
-
-    #[error("Image processing error: {0}")]
-    ImageError(String),
 }
 
-/// Result type for QuickCodes operations
 pub type Result<T> = std::result::Result<T, QuickCodesError>;

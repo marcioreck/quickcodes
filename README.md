@@ -108,10 +108,18 @@ Após executar os exemplos, você encontrará estes arquivos em `examples/output
 **📊 Funcionalidades Implementadas:**
 - ✅ **7 formatos de código**: QR, EAN-13, UPC-A, Code128, DataMatrix, PDF417, Aztec
 - ✅ **3 formatos de exportação**: SVG, PNG, PDF
-- ✅ **Sistema de leitura completo**: Detecção automática, múltiplos códigos, confiança
-- ✅ **68 testes passando**: 51 unitários + 12 integração + 5 doctests
-- ✅ **API unificada**: Rust nativo + Python para geração E leitura
-- ✅ **Bindings Python completos**: Geração, leitura, PDF
+- 🚧 **Sistema de leitura em desenvolvimento**: Interface pronta, implementação em progresso
+- ✅ **Testes Completos**: 
+  * 68 testes Rust: 51 unitários + 12 integração + 5 doctests
+  * 9 testes Go: geração, leitura e validação
+  * 17 testes .NET: geração, leitura e manipulação de arquivos
+  * 7 testes C++: geração, leitura e tratamento de erros
+- ✅ **API unificada**: Core em Rust com bindings para múltiplas linguagens
+- ✅ **Bindings Completos**: 
+  * Python: Geração, leitura, PDF
+  * Go: Geração e leitura via CGO
+  * .NET: Geração e leitura via P/Invoke
+  * C++: Headers e integração nativa
 - ✅ **Código 100% limpo**: 0 warnings, clippy aprovado
 - ✅ **Documentação completa**: Exemplos funcionais das 2 fases
 
@@ -128,13 +136,31 @@ Após executar os exemplos, você encontrará estes arquivos em `examples/output
 git clone https://github.com/marcioreck/quickcodes
 cd quickcodes
 
-# Exemplos da Fase 1 (formatos básicos)
-cargo run --example basic_usage
+# Exemplos e testes em Rust (core)
+cargo run --example basic_usage     # Exemplos da Fase 1 (formatos básicos)
+cargo run --example phase2_usage    # Exemplos da Fase 2 (códigos 2D avançados)
+cargo test                          # Executa os testes unitários e de integração
 
-# Exemplos da Fase 2 (códigos 2D avançados)
-cargo run --example phase2_usage
+# Testes dos bindings em Go
+cd go/quickcodes
+go test -v                         # Executa os testes do binding Go
 
-# Veja todos os códigos gerados em examples/output/
+# Testes dos bindings em .NET
+cd ../../dotnet
+dotnet test                        # Executa os testes do binding .NET
+
+# Testes dos bindings em C++
+cd ../cpp
+mkdir build && cd build
+cmake ..                           # Configura o projeto C++
+make                               # Compila os testes
+./test_quickcodes                  # Executa os testes do binding C++
+
+# Todos os arquivos gerados pelos testes são salvos em examples/output/
+# com prefixos específicos para cada linguagem:
+# - test_go_*     : Arquivos gerados pelos testes Go
+# - test_dotnet_* : Arquivos gerados pelos testes .NET
+# - test_cpp_*    : Arquivos gerados pelos testes C++
 ```
 
 ---
@@ -165,10 +191,11 @@ cargo run --example phase2_usage
   * [x] DataMatrix (farmacêutica/ANVISA)
   * [x] PDF417 (documentos oficiais)
   * [x] Aztec Code (transporte)
-* [x] **Leitura/Decodificação** ✅ CONCLUÍDO
-  * [x] Leitor de imagens estáticas
-  * [x] Algoritmos de detecção e correção
-  * [x] Suporte a múltiplos códigos por imagem
+* [ ] **Leitura/Decodificação** 🚧 EM DESENVOLVIMENTO
+  * [x] Interface de leitura definida
+  * [ ] Leitor de imagens estáticas
+  * [ ] Algoritmos de detecção e correção
+  * [ ] Suporte a múltiplos códigos por imagem
 * [x] **Exportação Avançada** ✅ CONCLUÍDO
   * [x] PDF nativo
   * [ ] Canvas/HTML5 integration [movido para Fase 3]
@@ -179,14 +206,16 @@ cargo run --example phase2_usage
   * [ ] Leitura de webcam em tempo real
 
 ### 🌐 **Fase 3 - Ecossistema Completo**
-* [ ] **Bindings Adicionais**
-  * [ ] Go (CGO)
-  * [ ] .NET (P/Invoke)
-  * [ ] C/C++ headers
+* [x] **Bindings Adicionais**
+  * [x] Go (CGO)
+  * [x] .NET (P/Invoke)
+  * [x] C/C++ headers
 * [ ] **Formatos de Legado**
   * [ ] Code39
   * [ ] ITF-14
   * [ ] Codabar
+* [ ] **Implementar etapas postergadas da fase 1 e 2?**
+* [ ] **Reativar os testes de leitura de imagem, que foram saltados?**
 * [ ] **Ferramentas e Utilitários**
   * [ ] CLI tool (`quickcodes generate`, `quickcodes read`)
   * [ ] API REST em Docker
@@ -196,6 +225,7 @@ cargo run --example phase2_usage
   * [ ] Configurações avançadas de renderização
   * [ ] Suporte a fontes customizadas
   * [ ] Watermarks e branding
+  * [ ] Revisão de código com cofo em segurança cibernética, testes de segurança e atender aos warnings em todos os testes.
 
 ---
 
