@@ -28,7 +28,7 @@ anyhow = "1.0"
 
 # Image processing and generation
 image = { version = "0.25", optional = true }
-resvg = { version = "0.44", optional = true }
+resvg = { version = "0.45", optional = true }
 usvg = { version = "0.44", optional = true }
 
 # QR Code generation
