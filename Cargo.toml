@@ -51,7 +51,7 @@ printpdf = { version = "0.7", optional = true }
 
 # Image reading and processing (for barcode detection)
 imageproc = { version = "0.25", optional = true }
-rqrr = { version = "0.7", optional = true }  # QR code reader
+rqrr = { version = "0.10", optional = true }  # QR code reader
 
 # Serialization
 serde = { version = "1.0", features = ["derive"] }
