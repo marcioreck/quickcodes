@@ -2,6 +2,7 @@ use anyhow::Result as AnyhowResult;
 
 pub mod exporters;
 pub mod generators;
+#[cfg(feature = "readers")]
 pub mod readers;
 pub mod types;
 
@@ -14,6 +15,7 @@ mod c_api;
 // Re-export public API
 pub use exporters::*;
 pub use generators::*;
+#[cfg(feature = "readers")]
 pub use readers::{read_from_file as readers_read_from_file, read_from_bytes as readers_read_from_bytes};
 pub use types::{BarcodeType, ExportFormat, QuickCodesError, ReadResult, Result};
 
@@ -68,7 +70,7 @@ pub fn generate(
         // Phase 3: Legacy formats
         BarcodeType::Code39 => generators::code39::generate_code39(data)?,
         BarcodeType::ITF14 => generators::itf14::generate_itf14(data)?,
-        BarcodeType::Codabar => generators::codabar::generate_codabar(data)?
+        BarcodeType::Codabar => generators::codabar::generate_codabar(data)?,
     };
 
     match format {
@@ -152,7 +154,7 @@ pub fn generate_to_file(
 pub fn read_from_file<P: AsRef<std::path::Path>>(_image_path: P) -> AnyhowResult<ReadResult> {
     #[cfg(feature = "readers")]
     {
-        Ok(readers_read_from_file(_image_path)?)
+        Ok(readers_read_from_file(_image_path)?.remove(0))
     }
 
     #[cfg(not(feature = "readers"))]
@@ -179,7 +181,7 @@ pub fn read_all_from_file<P: AsRef<std::path::Path>>(
 ) -> AnyhowResult<Vec<ReadResult>> {
     #[cfg(feature = "readers")]
     {
-        Ok(readers::read_all_from_file(_image_path)?)
+        Ok(readers::read_from_file(_image_path)?)
     }
 
     #[cfg(not(feature = "readers"))]
@@ -203,7 +205,7 @@ pub fn read_all_from_file<P: AsRef<std::path::Path>>(
 pub fn read_from_bytes(_image_data: &[u8], _format: Option<&str>) -> AnyhowResult<ReadResult> {
     #[cfg(feature = "readers")]
     {
-        Ok(readers_read_from_bytes(_image_data, _format)?)
+        Ok(readers_read_from_bytes(_image_data, _format)?.remove(0))
     }
 
     #[cfg(not(feature = "readers"))]

@@ -242,6 +242,11 @@ make                               # Compila os testes
   * [x] Codabar (bibliotecas)
   * [x] Criar uma pasta com documentação individual e resumida de cada um dos formatos abrangidos pelo QuickCodes, com exemplos de uso e explicações técnicas, com links para as especificações oficiais e para a documentação da biblioteca.
 * [ ] **Implementar etapas postergadas da fase 1 e 2, começando pela leitura e decodificação de imagem**
+  * [ ] Corrigir formatação da folha de testes em PDF.
+  * [ ] Leitura básica (implementar a leitura de imagem estática)
+  * [ ] Expansão de formatos
+  * [ ] Otimização
+  * [ ] Lançamento
 * [ ] **Reativar os testes de leitura de imagem, que foram saltados?**
 * [ ] **Ferramentas e Utilitários**
   * [ ] CLI tool (`quickcodes generate`, `quickcodes read`)

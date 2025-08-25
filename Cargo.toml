@@ -16,11 +16,6 @@ readme = "README.md"
 name = "quickcodes"
 crate-type = ["cdylib", "rlib", "staticlib"]
 
-# CLI will be added in Phase 1
-# [[bin]]
-# name = "quickcodes-cli"
-# path = "src/bin/cli.rs"
-
 [dependencies]
 # Error handling
 thiserror = "2.0"
@@ -28,29 +23,21 @@ anyhow = "1.0"
 
 # Image processing and generation
 image = { version = "0.25", optional = true }
+imageproc = { version = "0.23", optional = true }
 resvg = { version = "0.44", optional = true }
 usvg = { version = "0.44", optional = true }
+tiny-skia = { version = "0.11", optional = true }
 
 # QR Code generation
 qrcode = "0.14"
-
-# DataMatrix generation (implemented internally for now)
-# datamatrix = "0.3"  # Will add proper library support later
-
-# PDF417 generation (we'll implement basic version first)
-# pdf417 = "0.1"  # Will add if available, otherwise custom implementation
-
-# Aztec Code (we'll implement basic version first)
-# aztec = "0.1"  # Will add if available, otherwise custom implementation
 
 # SVG generation
 svg = "0.18"
 
 # PDF generation
-printpdf = { version = "0.7", optional = true }
+printpdf = { version = "0.7", features = ["embedded_images"], optional = true }
 
 # Image reading and processing (for barcode detection)
-imageproc = { version = "0.25", optional = true }
 rqrr = { version = "0.7", optional = true }  # QR code reader
 
 # Serialization
@@ -63,10 +50,13 @@ clap = { version = "4.5", features = ["derive"], optional = true }
 # Python bindings (optional)
 pyo3 = { version = "0.24", features = ["extension-module"], optional = true }
 
+# Date and time
+chrono = "0.4"
+
 [features]
-default = ["png", "svg"]
+default = ["png", "svg", "pdf"]
 png = ["dep:image"]
-svg = ["dep:resvg", "dep:usvg"]
+svg = ["dep:resvg", "dep:usvg", "dep:tiny-skia"]
 pdf = ["dep:printpdf"]
 readers = ["dep:image", "dep:imageproc", "dep:rqrr"]
 cli = ["dep:clap"]
@@ -75,8 +65,15 @@ python = ["dep:pyo3"]
 [dev-dependencies]
 criterion = "0.5"
 tempfile = "3.8"
+chrono = "0.4"
+printpdf = { version = "0.7", features = ["embedded_images"] }
+resvg = "0.44"
+usvg = "0.44"
+tiny-skia = "0.11"
+image = "0.25"
+imageproc = "0.23"
 
-# Benchmarks will be added later
-# [[bench]]
-# name = "generation_benchmark"
-# harness = false
+[[example]]
+name = "generate_test_sheet"
+path = "examples/generate_test_sheet.rs"
+required-features = ["svg", "pdf"]
