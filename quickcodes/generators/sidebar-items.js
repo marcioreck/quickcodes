@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["aztec","code128","datamatrix","ean13","pdf417","qr","upc"]};
+window.SIDEBAR_ITEMS = {"mod":["aztec","codabar","code128","code39","datamatrix","ean13","itf14","pdf417","qr","upc"]};
