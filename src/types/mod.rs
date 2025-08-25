@@ -179,6 +179,22 @@ impl BarcodeModules {
             }
         }
     }
+
+    /// Retorna os módulos como um vetor linear (1D)
+    pub fn as_linear(&self) -> Option<&Vec<bool>> {
+        match self {
+            BarcodeModules::Linear(data) => Some(data),
+            BarcodeModules::Matrix(_) => None,
+        }
+    }
+
+    /// Retorna os módulos como uma matriz (2D)
+    pub fn as_matrix(&self) -> Option<&Vec<Vec<bool>>> {
+        match self {
+            BarcodeModules::Linear(_) => None,
+            BarcodeModules::Matrix(data) => Some(data),
+        }
+    }
 }
 
 /// Result of reading a barcode from an image

@@ -17,12 +17,24 @@
 
 ## ✨ Features
 
-* ✅ Geração e leitura de códigos **1D**: EAN-13, UPC-A, Code128, Code39, ITF-14, Codabar
-* ✅ Geração e leitura de códigos **2D**: QR Code, DataMatrix, PDF417, Aztec
+* ✅ Geração e leitura de códigos **1D**:
+  * [EAN-13](docs/formats/1d/ean13.md) - Produtos comerciais
+  * [UPC-A](docs/formats/1d/upca.md) - Produtos EUA/Canadá
+  * [Code128](docs/formats/1d/code128.md) - Logística
+  * [Code39](docs/formats/1d/code39.md) - Industrial
+  * [ITF-14](docs/formats/1d/itf14.md) - Embalagens
+  * [Codabar](docs/formats/1d/codabar.md) - Bibliotecas/Laboratórios
+* ✅ Geração e leitura de códigos **2D**:
+  * [QR Code](docs/formats/2d/qrcode.md) - Uso geral/URLs
+  * [DataMatrix](docs/formats/2d/datamatrix.md) - Industrial/Farmacêutico
+  * [PDF417](docs/formats/2d/pdf417.md) - Documentos
+  * [Aztec](docs/formats/2d/aztec.md) - Transportes
 * ✅ Saída em **PNG, SVG, PDF, Canvas**
 * ✅ **Bindings** para Python, JavaScript (Node.js + WASM), e futuro suporte a Go e .NET
 * ✅ **Leitura em tempo real** de câmera (via WebAssembly no browser)
 * ✅ API simples e moderna
+
+📚 **[Documentação detalhada de todos os formatos](docs/formats/README.md)**
 
 ---
 
@@ -99,21 +111,32 @@ Após executar os exemplos, você encontrará estes arquivos em `examples/output
 - **aztec_event.png** - Aztec para eventos
 - **datamatrix_unicode.svg** - DataMatrix com Unicode
 
+**Fase 3 (Legados):**
+- **code39_serial.svg** - Code39: "SERIAL123ABC"
+- **itf14_box.png** - ITF-14: "1234567890123" (embalagens)
+- **codabar_library.svg** - Codabar: "A1234567890B" (bibliotecas)
+
+**Fase Permanente:**
+- **Implementar códigos futuros** - [EAN-8](docs/formats/1d/ean8.md) em desenvolvimento
+- **Manutenção do QuickCodes**
+
 ---
 
 ## 🎯 Status Atual
 
 ✅ **Fase 2 COMPLETA - Expansão Industrial Finalizada!**
+✅ **Fase 3 - Formatos Legados Implementados!**
 
 **📊 Funcionalidades Implementadas:**
-- ✅ **7 formatos de código**: QR, EAN-13, UPC-A, Code128, DataMatrix, PDF417, Aztec
+- ✅ **10 formatos de código**: QR, EAN-13, UPC-A, Code128, DataMatrix, PDF417, Aztec, Code39, ITF-14, Codabar
 - ✅ **3 formatos de exportação**: SVG, PNG, PDF
 - 🚧 **Sistema de leitura em desenvolvimento**: Interface pronta, implementação em progresso
 - ✅ **Testes Completos**: 
-  * 68 testes Rust: 51 unitários + 12 integração + 5 doctests
+  * 75 testes Rust: 60 unitários + 12 integração + 3 doctests
   * 9 testes Go: geração, leitura e validação
   * 17 testes .NET: geração, leitura e manipulação de arquivos
   * 7 testes C++: geração, leitura e tratamento de erros
+  * Total: 108 testes cobrindo todas as 3 fases
 - ✅ **API unificada**: Core em Rust com bindings para múltiplas linguagens
 - ✅ **Bindings Completos**: 
   * Python: Geração, leitura, PDF
@@ -121,7 +144,7 @@ Após executar os exemplos, você encontrará estes arquivos em `examples/output
   * .NET: Geração e leitura via P/Invoke
   * C++: Headers e integração nativa
 - ✅ **Código 100% limpo**: 0 warnings, clippy aprovado
-- ✅ **Documentação completa**: Exemplos funcionais das 2 fases
+- ✅ **Documentação completa**: Exemplos funcionais das 3 fases
 
 **🏭 Casos de Uso Industriais:**
 - ✅ **Farmacêutico**: DataMatrix para rastreabilidade ANVISA
@@ -130,6 +153,9 @@ Após executar os exemplos, você encontrará estes arquivos em `examples/output
 - ✅ **Varejo**: EAN-13/UPC-A para produtos
 - ✅ **Mobile**: QR Code para aplicações
 - ✅ **Logística**: Code128 para rastreamento
+- ✅ **Bibliotecas**: Codabar para empréstimos
+- ✅ **Embalagens**: ITF-14 para caixas
+- ✅ **Industrial**: Code39 para etiquetas
 
 ```bash
 # Teste a biblioteca agora:
@@ -139,19 +165,19 @@ cd quickcodes
 # Exemplos e testes em Rust (core)
 cargo run --example basic_usage     # Exemplos da Fase 1 (formatos básicos)
 cargo run --example phase2_usage    # Exemplos da Fase 2 (códigos 2D avançados)
+cargo run --example legacy_usage    # Exemplos da Fase 3 (formatos legados)
 cargo test                          # Executa os testes unitários e de integração
 
 # Testes dos bindings em Go
-cd go/quickcodes
-go test -v                         # Executa os testes do binding Go
+cd go/quickcodes && go test -v      # Executa os testes do binding Go
 
 # Testes dos bindings em .NET
-cd ../../dotnet
-dotnet test                        # Executa os testes do binding .NET
+cd ../../dotnet && dotnet test      # Executa os testes do binding .NET
 
 # Testes dos bindings em C++
 cd ../cpp
-mkdir build && cd build
+mkdir build 
+cd build
 cmake ..                           # Configura o projeto C++
 make                               # Compila os testes
 ./test_quickcodes                  # Executa os testes do binding C++
@@ -210,11 +236,12 @@ make                               # Compila os testes
   * [x] Go (CGO)
   * [x] .NET (P/Invoke)
   * [x] C/C++ headers
-* [ ] **Formatos de Legado**
-  * [ ] Code39
-  * [ ] ITF-14
-  * [ ] Codabar
-* [ ] **Implementar etapas postergadas da fase 1 e 2?**
+* [x] **Formatos de Legado**
+  * [x] Code39 (alfanumérico + símbolos)
+  * [x] ITF-14 (embalagens)
+  * [x] Codabar (bibliotecas)
+  * [x] Criar uma pasta com documentação individual e resumida de cada um dos formatos abrangidos pelo QuickCodes, com exemplos de uso e explicações técnicas, com links para as especificações oficiais e para a documentação da biblioteca.
+* [ ] **Implementar etapas postergadas da fase 1 e 2, começando pela leitura e decodificação de imagem**
 * [ ] **Reativar os testes de leitura de imagem, que foram saltados?**
 * [ ] **Ferramentas e Utilitários**
   * [ ] CLI tool (`quickcodes generate`, `quickcodes read`)
@@ -226,6 +253,7 @@ make                               # Compila os testes
   * [ ] Suporte a fontes customizadas
   * [ ] Watermarks e branding
   * [ ] Revisão de código com cofo em segurança cibernética, testes de segurança e atender aos warnings em todos os testes.
+  * [ ] Toda documentação atualizada e também disponível em inglês.
 
 ---
 

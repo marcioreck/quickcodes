@@ -65,18 +65,10 @@ pub fn generate(
         BarcodeType::PDF417 => generators::pdf417::generate_pdf417(data)?,
         BarcodeType::Aztec => generators::aztec::generate_aztec(data)?,
 
-        // Phase 3: Legacy formats (not yet implemented)
-        BarcodeType::Code39 | BarcodeType::ITF14 | BarcodeType::Codabar => {
-            return Err(anyhow::anyhow!(
-                "Barcode type {} not yet implemented - coming in Phase 3",
-                match barcode_type {
-                    BarcodeType::Code39 => "Code39",
-                    BarcodeType::ITF14 => "ITF-14",
-                    BarcodeType::Codabar => "Codabar",
-                    _ => unreachable!(),
-                }
-            ))
-        }
+        // Phase 3: Legacy formats
+        BarcodeType::Code39 => generators::code39::generate_code39(data)?,
+        BarcodeType::ITF14 => generators::itf14::generate_itf14(data)?,
+        BarcodeType::Codabar => generators::codabar::generate_codabar(data)?
     };
 
     match format {
@@ -256,9 +248,25 @@ mod tests {
 
     #[test]
     #[cfg(feature = "svg")]
-    fn test_unimplemented_barcode_type() {
-        let result = generate(BarcodeType::Code39, "test", ExportFormat::SVG);
-        assert!(result.is_err());
+    fn test_all_barcode_types() {
+        // Testar todos os tipos de código de barras
+        let test_cases = vec![
+            (BarcodeType::QRCode, "Hello, QuickCodes!"),
+            (BarcodeType::EAN13, "123456789012"),
+            (BarcodeType::UPCA, "03600029145"),
+            (BarcodeType::Code128, "HELLO123"),
+            (BarcodeType::Code39, "SERIAL123ABC"),
+            (BarcodeType::ITF14, "1234567890123"),
+            (BarcodeType::Codabar, "A1234567890B"),
+            (BarcodeType::DataMatrix, "DataMatrix Test"),
+            (BarcodeType::PDF417, "PDF417 Test"),
+            (BarcodeType::Aztec, "Aztec Test"),
+        ];
+
+        for (barcode_type, data) in test_cases {
+            let result = generate(barcode_type, data, ExportFormat::SVG);
+            assert!(result.is_ok(), "Failed to generate {:?}", barcode_type);
+        }
     }
 
     #[test]
