@@ -1,9 +1,9 @@
 (function() {
-    var implementors = Object.fromEntries([["quickcodes",[["impl <a class=\"trait\" href=\"https://docs.rs/serde/1.0.219/serde/ser/trait.Serialize.html\" title=\"trait serde::ser::Serialize\">Serialize</a> for <a class=\"enum\" href=\"quickcodes/types/enum.BarcodeType.html\" title=\"enum quickcodes::types::BarcodeType\">BarcodeType</a>"],["impl <a class=\"trait\" href=\"https://docs.rs/serde/1.0.219/serde/ser/trait.Serialize.html\" title=\"trait serde::ser::Serialize\">Serialize</a> for <a class=\"enum\" href=\"quickcodes/types/enum.ExportFormat.html\" title=\"enum quickcodes::types::ExportFormat\">ExportFormat</a>"],["impl <a class=\"trait\" href=\"https://docs.rs/serde/1.0.219/serde/ser/trait.Serialize.html\" title=\"trait serde::ser::Serialize\">Serialize</a> for <a class=\"enum\" href=\"quickcodes/types/enum.QRErrorCorrection.html\" title=\"enum quickcodes::types::QRErrorCorrection\">QRErrorCorrection</a>"],["impl <a class=\"trait\" href=\"https://docs.rs/serde/1.0.219/serde/ser/trait.Serialize.html\" title=\"trait serde::ser::Serialize\">Serialize</a> for <a class=\"struct\" href=\"quickcodes/types/struct.BarcodeConfig.html\" title=\"struct quickcodes::types::BarcodeConfig\">BarcodeConfig</a>"],["impl <a class=\"trait\" href=\"https://docs.rs/serde/1.0.219/serde/ser/trait.Serialize.html\" title=\"trait serde::ser::Serialize\">Serialize</a> for <a class=\"struct\" href=\"quickcodes/types/struct.QRConfig.html\" title=\"struct quickcodes::types::QRConfig\">QRConfig</a>"]]]]);
+    var implementors = Object.fromEntries([["quickcodes",[["impl <a class=\"trait\" href=\"https://docs.rs/serde/1.0.219/serde/ser/trait.Serialize.html\" title=\"trait serde::ser::Serialize\">Serialize</a> for <a class=\"enum\" href=\"quickcodes/types/enum.BarcodeType.html\" title=\"enum quickcodes::types::BarcodeType\">BarcodeType</a>"]]]]);
     if (window.register_implementors) {
         window.register_implementors(implementors);
     } else {
         window.pending_implementors = implementors;
     }
 })()
-//{"start":57,"fragment_lengths":[1456]}
+//{"start":57,"fragment_lengths":[298]}

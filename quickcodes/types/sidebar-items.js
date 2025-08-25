@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["BarcodeModules","BarcodeType","ExportFormat","QRErrorCorrection","QuickCodesError"],"struct":["Barcode","BarcodeConfig","QRConfig"],"type":["Result"]};
+window.SIDEBAR_ITEMS = {"enum":["BarcodeModules","BarcodeType","BarcodeTypeParseError","ExportFormat","QRErrorCorrection","QuickCodesError"],"struct":["Barcode","BarcodeConfig","QRConfig","ReadResult"],"type":["Result"]};
