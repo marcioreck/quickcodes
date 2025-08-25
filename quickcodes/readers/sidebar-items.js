@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["read_all_from_bytes","read_all_from_file","read_from_bytes","read_from_file"]};

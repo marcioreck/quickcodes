@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["generate","generate_to_file","read_all_from_file","read_from_bytes","read_from_file"],"mod":["exporters","generators","readers","types"]};
+window.SIDEBAR_ITEMS = {"fn":["generate","generate_to_file","read_all_from_file","read_from_bytes","read_from_file"],"mod":["exporters","generators","types"]};
