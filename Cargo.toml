@@ -47,7 +47,7 @@ qrcode = "0.14"
 svg = "0.18"
 
 # PDF generation
-printpdf = { version = "0.7", optional = true }
+printpdf = { version = "0.8", optional = true }
 
 # Image reading and processing (for barcode detection)
 imageproc = { version = "0.25", optional = true }
