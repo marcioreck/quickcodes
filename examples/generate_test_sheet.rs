@@ -3,10 +3,8 @@ use quickcodes::{generate, BarcodeType, ExportFormat};
 use std::fs::File;
 use std::io::BufWriter;
 use chrono::Local;
-use usvg::{Options, Tree};
-use resvg::render;
-use tiny_skia::{Pixmap, Transform};
-use tiny_skia::{Paint, Stroke, PathBuilder};
+use ::image::{self as image_crate, imageops, GenericImageView};
+use std::fs;
 // Helper trait to estimate text width for IndirectFontRef
 trait FontTextWidth {
     fn get_text_width(&self, text: &str, font_size: f32) -> Option<f32>;
@@ -26,18 +24,10 @@ const PAGE_WIDTH_MM: f32 = 210.0;  // A4 width in mm
 const PAGE_HEIGHT_MM: f32 = 297.0; // A4 height in mm
 const MARGIN_MM: f32 = 15.0;       // Margem externa em mm
 const INNER_MARGIN_MM: f32 = 0.0;  // Margem interna em mm
-const MAX_WIDTH_MM: f32 = PAGE_WIDTH_MM - (2.0 * MARGIN_MM) - (2.0 * INNER_MARGIN_MM);  // Largura máxima útil
+const MM_TO_POINTS: f32 = 72.0 / 25.4;  // Conversão de mm para pontos (1 inch = 72 points = 25.4 mm)
 
-// Tamanhos base dos códigos (já em tamanho final desejado)
-const BARCODE_1D_WIDTH: f32 = 160.0;      // Largura para códigos 1D
-const BARCODE_1D_HEIGHT: f32 = 80.0;      // Altura aumentada para melhor leitura
-const BARCODE_2D_LARGE: f32 = 120.0;      // QR e Aztec quadrados
-const BARCODE_2D_MEDIUM: f32 = 100.0;     // DataMatrix um pouco menor
-const BARCODE_PDF417_WIDTH: f32 = 160.0;  // Mesmo que 1D
-const BARCODE_PDF417_HEIGHT: f32 = 80.0;  // Mesmo que 1D
-
-// Conversão mm para pontos (pts)
-const MM_TO_POINTS: f32 = 2.834645669291339; // 1mm = 2.83... pts
+// Fator de escala uniforme para todos os códigos de barras
+const SCALE_FACTOR: f32 = 3.0;
 
 fn mm_to_points(mm: f32) -> f32 {
     mm * MM_TO_POINTS
@@ -72,6 +62,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     add_text(&current_layer, &font_bold, 5.0, "1. Códigos 1D (Lineares)", MARGIN_MM, y_pos, false);
     y_pos -= 8.0;
 
+    // Definir prefixo para arquivos temporários baseado no nome do PDF
+    let test_sheet_prefix = "test_sheet_v1";
+    
+    // Limpar arquivos antigos antes de gerar novo PDF
+    cleanup_old_files(test_sheet_prefix)?;
+
     // EAN-13
     add_barcode_section(
         &current_layer,
@@ -82,16 +78,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "EAN-13",
         BarcodeType::EAN13,
         "123456789012",  // 12 dígitos, o 13º será calculado
-        BARCODE_1D_WIDTH,
-        BARCODE_1D_HEIGHT,
+        test_sheet_prefix,
     )?;
 
-    // Criar nova página para continuar
-    let (page2, layer2) = doc.add_page(Mm(PAGE_WIDTH_MM), Mm(PAGE_HEIGHT_MM), "Layer 2");
-    let current_layer = doc.get_page(page2).get_layer(layer2);
-    
-    // Resetar posição para nova página
-    y_pos = PAGE_HEIGHT_MM - MARGIN_MM - 8.0;
+    y_pos -= 100.0;
 
     // UPC-A
     add_barcode_section(
@@ -103,8 +93,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "UPC-A",
         BarcodeType::UPCA,
         "03600029145",  // 11 dígitos, o 12º será calculado
-        BARCODE_1D_WIDTH,
-        BARCODE_1D_HEIGHT,
+        test_sheet_prefix,
     )?;
 
     // Criar nova página para continuar
@@ -124,16 +113,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "Code128",
         BarcodeType::Code128,
         "HELLO123",
-        BARCODE_1D_WIDTH,
-        BARCODE_1D_HEIGHT,
+        test_sheet_prefix,
     )?;
 
-    // Criar nova página para continuar
-    let (page4, layer4) = doc.add_page(Mm(PAGE_WIDTH_MM), Mm(PAGE_HEIGHT_MM), "Layer 4");
-    let current_layer = doc.get_page(page4).get_layer(layer4);
-    
-    // Resetar posição para nova página
-    y_pos = PAGE_HEIGHT_MM - MARGIN_MM - 8.0;
+    y_pos -= 100.0;
 
     // Code39
     add_barcode_section(
@@ -145,8 +128,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "Code39",
         BarcodeType::Code39,
         "SERIAL-123ABC",
-        BARCODE_1D_WIDTH,
-        BARCODE_1D_HEIGHT,
+        test_sheet_prefix,
     )?;
 
     // Criar nova página para continuar
@@ -166,16 +148,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "ITF-14",
         BarcodeType::ITF14,
         "1234567890123",  // 13 dígitos, o 14º será calculado
-        BARCODE_1D_WIDTH,
-        BARCODE_1D_HEIGHT,
+        test_sheet_prefix,
     )?;
 
-    // Criar nova página para continuar
-    let (page6, layer6) = doc.add_page(Mm(PAGE_WIDTH_MM), Mm(PAGE_HEIGHT_MM), "Layer 6");
-    let current_layer = doc.get_page(page6).get_layer(layer6);
-    
-    // Resetar posição para nova página
-    y_pos = PAGE_HEIGHT_MM - MARGIN_MM - 8.0;
+    y_pos -= 100.0;
 
     // Codabar
     add_barcode_section(
@@ -187,8 +163,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "Codabar",
         BarcodeType::Codabar,
         "A1234567890B",
-        BARCODE_1D_WIDTH,
-        BARCODE_1D_HEIGHT,
+        test_sheet_prefix,
     )?;
 
     // Criar nova página para continuar
@@ -212,16 +187,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "QR Code",
         BarcodeType::QRCode,
         "https://github.com/marcioreck/quickcodes",
-        BARCODE_2D_LARGE,
-        BARCODE_2D_LARGE,
+        test_sheet_prefix,
     )?;
 
-    // Criar nova página para continuar
-    let (page8, layer8) = doc.add_page(Mm(PAGE_WIDTH_MM), Mm(PAGE_HEIGHT_MM), "Layer 8");
-    let current_layer = doc.get_page(page8).get_layer(layer8);
-    
-    // Resetar posição para nova página
-    y_pos = PAGE_HEIGHT_MM - MARGIN_MM - 8.0;
+    y_pos -= 100.0;
 
     // DataMatrix
     add_barcode_section(
@@ -233,8 +202,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "DataMatrix",
         BarcodeType::DataMatrix,
         "010123456789012815240101",
-        BARCODE_2D_MEDIUM,
-        BARCODE_2D_MEDIUM,
+        test_sheet_prefix,
     )?;
 
     // Criar nova página para continuar
@@ -254,16 +222,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "PDF417",
         BarcodeType::PDF417,
         "DRIVER LICENSE|DOE,JOHN|DOB:1990-01-01",
-        BARCODE_PDF417_WIDTH,
-        BARCODE_PDF417_HEIGHT,
+        test_sheet_prefix,
     )?;
 
-    // Criar nova página para continuar
-    let (page10, layer10) = doc.add_page(Mm(PAGE_WIDTH_MM), Mm(PAGE_HEIGHT_MM), "Layer 10");
-    let current_layer = doc.get_page(page10).get_layer(layer10);
-    
-    // Resetar posição para nova página
-    y_pos = PAGE_HEIGHT_MM - MARGIN_MM - 8.0;
+    y_pos -= 100.0;
 
     // Aztec
     add_barcode_section(
@@ -275,10 +237,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "Aztec",
         BarcodeType::Aztec,
         "TKT:A12345|FROM:NYC|TO:BOS|DATE:2025-08-21",
-        BARCODE_2D_LARGE,
-        BARCODE_2D_LARGE,
+        test_sheet_prefix,
     )?;
-    y_pos -= 10.0;
+
+    y_pos -= 12.0 * 10.0;
 
     // Adicionar rodapé
     add_text(&current_layer, &font, 4.0, "Dispositivo de Leitura: _________________", MARGIN_MM, y_pos, false);
@@ -332,120 +294,94 @@ fn add_barcode_section(
     title: &str,
     barcode_type: BarcodeType,
     data: &str,
-    width_mm: f32,
-    height_mm: f32,
+    prefix: &str,
 ) -> Result<f32, Box<dyn std::error::Error>> {
     let mut y = y_pos;
 
     // Título e dados
     add_text(layer, font, 4.0, &format!("{}:", title), x_pos, y, false);
-    y -= 4.0;
+    y -= 5.0;   // Maior espaçamento entre título e dados
     add_text(layer, font_mono, 3.5, &format!("Dados: {}", data), x_pos + 2.0, y, false);
-    y -= 6.0;
+    y -= 8.0;   // Maior espaçamento entre dados e código de barras
 
-    // Gerar código de barras SVG
+    // Gerar códigos de barras PNG e SVG usando o prefixo
     let barcode_svg = String::from_utf8(generate(barcode_type, data, ExportFormat::SVG)?)?;
+    let barcode_png = generate(barcode_type, data, ExportFormat::PNG)?;
 
-    // Salvar SVG
+    // Salvar arquivos com prefixo
     let output_dir = "examples/output";
     std::fs::create_dir_all(output_dir)?;
-    let svg_filename = format!("{}/barcode_{:?}_{}.svg", output_dir, barcode_type, data.replace('/', "_"));
+    
+    let safe_data = data.replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], "_");
+    let svg_filename = format!("{}/{}_barcode_{:?}_{}.svg", output_dir, prefix, barcode_type, safe_data);
+    let png_filename = format!("{}/{}_barcode_{:?}_{}.png", output_dir, prefix, barcode_type, safe_data);
+    
     std::fs::write(&svg_filename, &barcode_svg)?;
+    std::fs::write(&png_filename, &barcode_png)?;
 
-    // Configurar renderização SVG
-    let mut opt = Options::default();
-    opt.font_size = 8.0;
-    opt.dpi = 300.0;
-    opt.shape_rendering = usvg::ShapeRendering::CrispEdges;
+    // Carregar arquivo PNG existente diretamente
+    println!("Carregando PNG existente: {}", png_filename);
+    let png_data = std::fs::read(&png_filename)?;
+    
+    // Usar a biblioteca image para obter as dimensões do PNG
+    let img = image_crate::load_from_memory(&png_data)?;
+    let (png_width_px, png_height_px) = img.dimensions();
+    
+    println!("Dimensões PNG original: {}x{} pixels", png_width_px, png_height_px);
+    
+    // Converter para RGB se necessário
+    let rgb_img = img.to_rgb8();
 
-    // Converter SVG para imagem
-    let tree = Tree::from_str(&barcode_svg, &opt)?;
-    let tree_size = tree.size();
+    // Aplicar escala uniforme mantendo proporções
+    let scaled_width = (png_width_px as f32 * SCALE_FACTOR) as u32;
+    let scaled_height = (png_height_px as f32 * SCALE_FACTOR) as u32;
+    
+    println!("Aplicando escala {}x: {}x{} → {}x{} pixels", 
+             SCALE_FACTOR, png_width_px, png_height_px, scaled_width, scaled_height);
 
-    // Verificar se a largura excede o máximo disponível para PDF
-    let final_width = if width_mm > MAX_WIDTH_MM {
-        let scale_down = MAX_WIDTH_MM / width_mm;
-        width_mm * scale_down
-    } else {
-        width_mm
-    };
-    let final_height = height_mm * (final_width / width_mm);
-
-    // Calcular dimensões para PNG (usar largura/altura originais)
-    let png_render_scale = 8.0; // Alta qualidade para PNG
-    let png_width_px = (width_mm * MM_TO_POINTS * png_render_scale) as u32;
-    let png_height_px = (height_mm * MM_TO_POINTS * png_render_scale) as u32;
-
-    let mut png_pixmap = Pixmap::new(png_width_px, png_height_px)
-        .ok_or("Failed to create PNG pixmap")?;
-    png_pixmap.fill(tiny_skia::Color::WHITE);
-    let png_transform = Transform::from_scale(
-        png_width_px as f32 / tree_size.width(),
-        png_height_px as f32 / tree_size.height(),
+    // Redimensionar a imagem PNG mantendo proporções
+    let resized_img = imageops::resize(
+        &rgb_img,
+        scaled_width,
+        scaled_height,
+        imageops::FilterType::Lanczos3
     );
-    render(&tree, png_transform, &mut png_pixmap.as_mut());
+    let final_image_data = resized_img.as_raw().clone();
 
-    // Salvar PNG
-    //let png_filename = format!("{}/barcode_{:?}_{}.png", output_dir, barcode_type, data.replace('/', "_"));
-    //png_pixmap.save_png(&png_filename).map_err(|e| format!("PNG save error: {:?}", e))?;
-
-    // Calcular dimensões para PDF (usar largura/altura ajustados em pontos)
-    let pdf_width_pt = (final_width * MM_TO_POINTS).round() as u32;
-    let pdf_height_pt = (final_height * MM_TO_POINTS).round() as u32;
-    println!("PDF image dimensions: width = {} pt, height = {} pt", pdf_width_pt, pdf_height_pt);
+    // Usar as dimensões escaladas
+    let pdf_width_pt = scaled_width;
+    let pdf_height_pt = scaled_height;
+    
+    // Calcular dimensões finais em mm para posicionamento
+    let final_width_mm = pdf_width_pt as f32 / MM_TO_POINTS;
+    let final_height_mm = pdf_height_pt as f32 / MM_TO_POINTS;
+    
+    println!("Dimensões finais no PDF: {}x{} pt = {:.1}x{:.1} mm", 
+             pdf_width_pt, pdf_height_pt, final_width_mm, final_height_mm);
 
     if pdf_width_pt == 0 || pdf_height_pt == 0 {
-        return Err("PDF image dimensions are zero; cannot create pixmap".into());
+        return Err("PDF image dimensions are zero; cannot create image".into());
     }
-    let mut pdf_pixmap = Pixmap::new(pdf_width_pt, pdf_height_pt)
-        .ok_or("Failed to create PDF pixmap")?;
-    // Preencher o fundo com branco
-    pdf_pixmap.fill(tiny_skia::Color::WHITE);
 
-    // Renderizar SVG para pixmap
-    let pdf_transform = Transform::from_scale(
-        pdf_width_pt as f32 / tree_size.width(),
-        pdf_height_pt as f32 / tree_size.height(),
-    );
-    render(&tree, pdf_transform, &mut pdf_pixmap.as_mut());
-
-    // Desenhar uma borda preta de 3px ao redor da imagem (após renderizar SVG)
-    let mut pb = PathBuilder::new();
-    let border_offset = 1.5;
-    pb.move_to(border_offset, border_offset);
-    pb.line_to(pdf_width_pt as f32 - border_offset, border_offset);
-    pb.line_to(pdf_width_pt as f32 - border_offset, pdf_height_pt as f32 - border_offset);
-    pb.line_to(border_offset, pdf_height_pt as f32 - border_offset);
-    pb.close();
-
-    let path = pb.finish().unwrap();
-    let mut paint = Paint::default();
-    paint.set_color(tiny_skia::Color::BLACK);
-    let stroke = Stroke {
-        width: 3.0,
-        ..Default::default()
-    };
-    pdf_pixmap.stroke_path(&path, &paint, &stroke, tiny_skia::Transform::identity(), None);
-
-    // Converter para XObject
+    // Converter para XObject usando os dados PNG escalados
     let image = Image::from(ImageXObject {
         width: Px(pdf_width_pt as usize),
         height: Px(pdf_height_pt as usize),
         color_space: ColorSpace::Rgb,
         bits_per_component: ColorBits::Bit8,
-        interpolate: false,
-        image_data: pdf_pixmap.data().to_vec(),
+        interpolate: true,
+        image_data: final_image_data,
         image_filter: None,
         clipping_bbox: None,
         smask: None,
     });
 
-    // Adicionar ao PDF com dimensões exatas em mm
+    // Adicionar ao PDF com dimensões escaladas
     image.add_to_layer(
         layer.clone(),
         ImageTransform {
             translate_x: Some(Mm(x_pos + INNER_MARGIN_MM)),
-            translate_y: Some(Mm(y - final_height)),
+            translate_y: Some(Mm(y - final_height_mm / 4.0)),
             scale_x: None,
             scale_y: None,
             ..Default::default()
@@ -453,10 +389,36 @@ fn add_barcode_section(
     );
 
     // Campos de resultado
-    y -= final_height + 8.0;
+    y -= final_height_mm / 4.0 + 8.0;
     add_text(layer, font, 3.5, "Resultado: □ OK  □ Falha", x_pos + 2.0, y, false);
-    y -= 3.0;
+    y -= 4.0;   // Maior espaçamento entre linhas
     add_text(layer, font, 3.5, "Observações: _________________________", x_pos + 2.0, y, false);
 
     Ok(y)
+}
+
+fn cleanup_old_files(prefix: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let output_dir = "examples/output";
+    
+    if let Ok(entries) = fs::read_dir(output_dir) {
+        for entry in entries {
+            if let Ok(entry) = entry {
+                let file_name = entry.file_name();
+                if let Some(name_str) = file_name.to_str() {
+                    // Verificar se o arquivo tem o prefixo correto e é PNG ou SVG
+                    if name_str.starts_with(&format!("{}_barcode_", prefix)) && 
+                       (name_str.ends_with(".png") || name_str.ends_with(".svg")) {
+                        let file_path = entry.path();
+                        if let Err(e) = fs::remove_file(&file_path) {
+                            println!("Aviso: Não foi possível remover {:?}: {}", file_path, e);
+                        } else {
+                            println!("Removido: {:?}", file_path);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    Ok(())
 }
