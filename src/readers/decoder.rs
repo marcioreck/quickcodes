@@ -1,7 +1,7 @@
-use image::GrayImage;
-use anyhow::Result;
+use super::detector::{detect_codes, DetectionResult};
 use crate::types::{BarcodeType, ReadResult};
-use super::detector::{DetectionResult, detect_codes};
+use anyhow::Result;
+use image::GrayImage;
 
 /// Decodifica códigos detectados em uma imagem
 pub(crate) fn decode_image(image: &GrayImage) -> Result<Vec<ReadResult>> {
@@ -114,7 +114,7 @@ mod tests {
     #[test]
     fn test_decode_with_pattern() {
         let mut image = GrayImage::new(100, 100);
-        
+
         // Criar um padrão de barras simples
         for x in 0..100 {
             let value = if x % 2 == 0 { 0 } else { 255 };

@@ -1,3 +1,4 @@
+use anyhow::Result;
 use image::{DynamicImage, GrayImage, ImageBuffer, Luma};
 use imageproc::{
     contrast::adaptive_threshold,
@@ -6,7 +7,6 @@ use imageproc::{
     geometric_transformations::{rotate_about_center, Interpolation},
     morphology::{dilate, erode},
 };
-use anyhow::Result;
 
 /// Prepara a imagem para detecção de códigos
 pub(crate) fn prepare_image(image: &DynamicImage) -> Result<GrayImage> {
@@ -41,7 +41,7 @@ pub(crate) fn correct_orientation(image: &GrayImage) -> Result<GrayImage> {
 /// Encontra regiões que podem conter códigos de barras
 pub(crate) fn find_regions(image: &GrayImage) -> Result<Vec<Region>> {
     let mut regions = Vec::new();
-    
+
     // TODO: Implementar detecção de regiões usando análise de componentes conectados
     // Por enquanto, retorna a imagem inteira como uma região
     regions.push(Region {
@@ -71,7 +71,7 @@ impl Region {
     /// Extrai a região da imagem original
     pub fn extract(&self, image: &GrayImage) -> Result<GrayImage> {
         let mut region = ImageBuffer::new(self.width, self.height);
-        
+
         // Copiar pixels da região
         for y in 0..self.height {
             for x in 0..self.width {
@@ -109,7 +109,7 @@ mod tests {
                 image.put_pixel(x, y, Luma([128u8]));
             }
         }
-        
+
         let dynamic = DynamicImage::ImageLuma8(image);
         let result = prepare_image(&dynamic);
         assert!(result.is_ok());
@@ -120,7 +120,7 @@ mod tests {
         let image = GrayImage::new(100, 100);
         let regions = find_regions(&image).unwrap();
         assert!(!regions.is_empty());
-        
+
         let region = &regions[0];
         assert_eq!(region.width, 100);
         assert_eq!(region.height, 100);

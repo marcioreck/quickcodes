@@ -1,7 +1,7 @@
+use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::str::FromStr;
 use thiserror::Error;
-use serde::{Serialize, Deserialize};
 
 /// Supported barcode types
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

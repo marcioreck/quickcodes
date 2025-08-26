@@ -1,11 +1,18 @@
-use crate::types::{Barcode, BarcodeModules, BarcodeType, BarcodeConfig};
+use crate::types::{Barcode, BarcodeConfig, BarcodeModules, BarcodeType};
 use anyhow::Result;
 
 // Padrões de codificação ITF-14
 const ITF_PATTERNS: &[(&str, &str)] = &[
-    ("0", "00110"), ("1", "10001"), ("2", "01001"), ("3", "11000"),
-    ("4", "00101"), ("5", "10100"), ("6", "01100"), ("7", "00011"),
-    ("8", "10010"), ("9", "01010"),
+    ("0", "00110"),
+    ("1", "10001"),
+    ("2", "01001"),
+    ("3", "11000"),
+    ("4", "00101"),
+    ("5", "10100"),
+    ("6", "01100"),
+    ("7", "00011"),
+    ("8", "10010"),
+    ("9", "01010"),
 ];
 
 /// Calcula o dígito verificador ITF-14

@@ -1,13 +1,28 @@
-use crate::types::{Barcode, BarcodeModules, BarcodeType, BarcodeConfig};
+use crate::types::{Barcode, BarcodeConfig, BarcodeModules, BarcodeType};
 use anyhow::Result;
 
 // Padrões de codificação Codabar
 const CODABAR_PATTERNS: &[(&str, &str)] = &[
-    ("0", "0000011"), ("1", "0000110"), ("2", "0001001"), ("3", "1100000"),
-    ("4", "0010010"), ("5", "1000010"), ("6", "0100001"), ("7", "0100100"),
-    ("8", "0110000"), ("9", "1001000"), ("-", "0001100"), ("$", "0011000"),
-    (":", "1000101"), ("/", "1010001"), (".", "1010100"), ("+", "0010101"),
-    ("A", "1011001"), ("B", "1001011"), ("C", "0011011"), ("D", "0011101"),
+    ("0", "0000011"),
+    ("1", "0000110"),
+    ("2", "0001001"),
+    ("3", "1100000"),
+    ("4", "0010010"),
+    ("5", "1000010"),
+    ("6", "0100001"),
+    ("7", "0100100"),
+    ("8", "0110000"),
+    ("9", "1001000"),
+    ("-", "0001100"),
+    ("$", "0011000"),
+    (":", "1000101"),
+    ("/", "1010001"),
+    (".", "1010100"),
+    ("+", "0010101"),
+    ("A", "1011001"),
+    ("B", "1001011"),
+    ("C", "0011011"),
+    ("D", "0011101"),
 ];
 
 /// Gera um código de barras Codabar
@@ -96,7 +111,10 @@ mod tests {
     fn test_codabar_invalid_chars() {
         let result = generate_codabar("A123X456B");
         assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("Invalid character"));
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Invalid character"));
     }
 
     #[test]

@@ -11,8 +11,8 @@ pub mod datamatrix;
 pub mod pdf417;
 
 // Phase 3: Legacy formats
-pub mod code39;
 pub mod codabar;
+pub mod code39;
 pub mod itf14;
 
 // Re-export generator functions

@@ -16,7 +16,9 @@ mod c_api;
 pub use exporters::*;
 pub use generators::*;
 #[cfg(feature = "readers")]
-pub use readers::{read_from_file as readers_read_from_file, read_from_bytes as readers_read_from_bytes};
+pub use readers::{
+    read_from_bytes as readers_read_from_bytes, read_from_file as readers_read_from_file,
+};
 pub use types::{BarcodeType, ExportFormat, QuickCodesError, ReadResult, Result};
 
 /// Main generation function - unified API for all barcode types

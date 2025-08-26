@@ -3,8 +3,8 @@ use std::os::raw::{c_char, c_int};
 use std::slice;
 use std::str::FromStr;
 
-use crate::{generate, generate_to_file, read_from_file, read_from_bytes};
 use crate::types::{BarcodeType, ExportFormat};
+use crate::{generate, generate_to_file, read_from_bytes, read_from_file};
 
 #[repr(C)]
 pub struct QuickCodesError {
@@ -43,10 +43,10 @@ pub extern "C" fn quickcodes_generate(
     let result = catch_unwind_result(|| {
         let barcode_type = unsafe { CStr::from_ptr(barcode_type) }.to_str()?;
         let data = unsafe { CStr::from_ptr(data) }.to_str()?;
-        
+
         let barcode_type = BarcodeType::from_str(barcode_type)?;
         let output = generate(barcode_type, data, ExportFormat::PNG)?;
-        
+
         Ok(output)
     });
 
@@ -63,10 +63,10 @@ pub extern "C" fn quickcodes_generate_to_file(
         let barcode_type = unsafe { CStr::from_ptr(barcode_type) }.to_str()?;
         let data = unsafe { CStr::from_ptr(data) }.to_str()?;
         let output_path = unsafe { CStr::from_ptr(output_path) }.to_str()?;
-        
+
         let barcode_type = BarcodeType::from_str(barcode_type)?;
         generate_to_file(barcode_type, data, output_path)?;
-        
+
         Ok(Vec::new()) // Empty success result
     });
 
@@ -74,13 +74,11 @@ pub extern "C" fn quickcodes_generate_to_file(
 }
 
 #[no_mangle]
-pub extern "C" fn quickcodes_read_from_file(
-    file_path: *const c_char,
-) -> *mut QuickCodesResult {
+pub extern "C" fn quickcodes_read_from_file(file_path: *const c_char) -> *mut QuickCodesResult {
     let result = catch_unwind_result(|| {
         let file_path = unsafe { CStr::from_ptr(file_path) }.to_str()?;
         let output = read_from_file(file_path)?;
-        
+
         let data = CString::new(output.data)?;
         Ok(data.into_bytes_with_nul())
     });
@@ -89,14 +87,11 @@ pub extern "C" fn quickcodes_read_from_file(
 }
 
 #[no_mangle]
-pub extern "C" fn quickcodes_read_from_bytes(
-    data: *const u8,
-    len: usize,
-) -> *mut QuickCodesResult {
+pub extern "C" fn quickcodes_read_from_bytes(data: *const u8, len: usize) -> *mut QuickCodesResult {
     let result = catch_unwind_result(|| {
         let data = unsafe { slice::from_raw_parts(data, len) };
         let output = read_from_bytes(data, None)?;
-        
+
         let data = CString::new(output.data)?;
         Ok(data.into_bytes_with_nul())
     });
@@ -129,9 +124,8 @@ where
             }
         }
         Ok(Err(e)) => {
-            let message = CString::new(e.to_string()).unwrap_or_else(|_| {
-                CString::new("Error converting error message").unwrap()
-            });
+            let message = CString::new(e.to_string())
+                .unwrap_or_else(|_| CString::new("Error converting error message").unwrap());
             QuickCodesResult {
                 data: std::ptr::null_mut(),
                 len: 0,
@@ -145,9 +139,7 @@ where
             data: std::ptr::null_mut(),
             len: 0,
             error: Box::into_raw(Box::new(QuickCodesError {
-                message: CString::new("Panic in Rust code")
-                    .unwrap()
-                    .into_raw(),
+                message: CString::new("Panic in Rust code").unwrap().into_raw(),
                 code: 2,
             })),
         },

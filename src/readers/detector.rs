@@ -1,7 +1,7 @@
-use image::GrayImage;
-use anyhow::Result;
-use super::image_processing::{Region, prepare_image, find_regions};
+use super::image_processing::{find_regions, prepare_image, Region};
 use crate::types::BarcodeType;
+use anyhow::Result;
+use image::GrayImage;
 
 /// Resultado da detecção de um código
 #[derive(Debug)]
@@ -41,12 +41,12 @@ pub(crate) fn detect_codes(image: &GrayImage) -> Result<Vec<DetectionResult>> {
 fn detect_1d(image: &GrayImage, region: &Region) -> Result<Option<DetectionResult>> {
     // Análise de linhas de varredura
     let scan_lines = get_scan_lines(image);
-    
+
     // Para cada linha de varredura
     for line in scan_lines {
         // Detectar padrões de barras
         let bars = detect_bars(&line)?;
-        
+
         // Tentar decodificar como diferentes tipos
         if let Some(result) = try_decode_ean13(&bars)? {
             return Ok(Some(DetectionResult {
@@ -96,7 +96,7 @@ fn detect_2d(image: &GrayImage, region: &Region) -> Result<Option<DetectionResul
 /// Obtém linhas de varredura de uma imagem
 fn get_scan_lines(image: &GrayImage) -> Vec<Vec<u8>> {
     let mut lines = Vec::new();
-    
+
     // Linha central horizontal
     let y = image.height() / 2;
     let mut line = Vec::new();
@@ -106,7 +106,7 @@ fn get_scan_lines(image: &GrayImage) -> Vec<Vec<u8>> {
     lines.push(line);
 
     // TODO: Adicionar mais linhas em diferentes ângulos
-    
+
     lines
 }
 
@@ -171,9 +171,9 @@ mod tests {
         let line = vec![0, 0, 255, 255, 0, 0, 255];
         let bars = detect_bars(&line).unwrap();
         assert_eq!(bars.len(), 4);
-        assert_eq!(bars[0], (true, 2));  // Preto
+        assert_eq!(bars[0], (true, 2)); // Preto
         assert_eq!(bars[1], (false, 2)); // Branco
-        assert_eq!(bars[2], (true, 2));  // Preto
+        assert_eq!(bars[2], (true, 2)); // Preto
         assert_eq!(bars[3], (false, 1)); // Branco
     }
 
@@ -187,7 +187,7 @@ mod tests {
     #[test]
     fn test_detect_codes_with_pattern() {
         let mut image = GrayImage::new(100, 100);
-        
+
         // Criar um padrão de barras simples
         for x in 0..100 {
             let value = if x % 2 == 0 { 0 } else { 255 };
