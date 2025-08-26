@@ -22,7 +22,7 @@ thiserror = "2.0"
 anyhow = "1.0"
 
 # Image processing and generation
-image = { version = "0.25", optional = true }
+image = { version = "0.24", optional = true }
 imageproc = { version = "0.23", optional = true }
 resvg = { version = "0.44", optional = true }
 usvg = { version = "0.44", optional = true }
@@ -54,7 +54,7 @@ pyo3 = { version = "0.24", features = ["extension-module"], optional = true }
 chrono = "0.4"
 
 [features]
-default = ["png", "svg", "pdf"]
+default = ["png", "svg", "pdf", "readers"]
 png = ["dep:image"]
 svg = ["dep:resvg", "dep:usvg", "dep:tiny-skia"]
 pdf = ["dep:printpdf"]
@@ -70,7 +70,7 @@ printpdf = { version = "0.7", features = ["embedded_images"] }
 resvg = "0.44"
 usvg = "0.44"
 tiny-skia = "0.11"
-image = "0.25"
+image = "0.24"
 imageproc = "0.23"
 
 [[example]]

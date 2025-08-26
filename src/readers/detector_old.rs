@@ -227,6 +227,60 @@ fn find_datamatrix_patterns(image: &GrayImage) -> Result<Option<f32>> {
         Ok(None)
     }
 }
+    let y = image.height() / 2;
+    let mut line = Vec::new();
+    for x in 0..image.width() {
+        line.push(image.get_pixel(x, y)[0]);
+    }
+    lines.push(line);
+
+    // TODO: Adicionar mais linhas em diferentes ângulos
+
+    lines
+}
+
+/// Detecta barras em uma linha de varredura
+fn detect_bars(line: &[u8]) -> Result<Vec<(bool, u32)>> {
+    let mut bars = Vec::new();
+    let mut current_bar = (line[0] < 128, 1);
+
+    for &pixel in line.iter().skip(1) {
+        let is_black = pixel < 128;
+        if is_black == current_bar.0 {
+            current_bar.1 += 1;
+        } else {
+            bars.push(current_bar);
+            current_bar = (is_black, 1);
+        }
+    }
+    bars.push(current_bar);
+
+    Ok(bars)
+}
+
+/// Tenta decodificar como EAN-13
+fn try_decode_ean13(bars: &[(bool, u32)]) -> Result<Option<f32>> {
+    // TODO: Implementar decodificação EAN-13
+    Ok(None)
+}
+
+/// Tenta decodificar como Code128
+fn try_decode_code128(bars: &[(bool, u32)]) -> Result<Option<f32>> {
+    // TODO: Implementar decodificação Code128
+    Ok(None)
+}
+
+/// Procura padrões finder de QR Code
+fn find_qr_patterns(image: &GrayImage) -> Result<Option<f32>> {
+    // TODO: Implementar detecção de padrões QR
+    Ok(None)
+}
+
+/// Procura padrões finder de DataMatrix
+fn find_datamatrix_patterns(image: &GrayImage) -> Result<Option<f32>> {
+    // TODO: Implementar detecção de padrões DataMatrix
+    Ok(None)
+}
 
 #[cfg(test)]
 mod tests {
@@ -245,7 +299,11 @@ mod tests {
     fn test_detect_bars() {
         let line = vec![0, 0, 255, 255, 0, 0, 255];
         let bars = detect_bars(&line).unwrap();
-        assert!(bars.len() >= 3);
+        assert_eq!(bars.len(), 4);
+        assert_eq!(bars[0], (true, 2)); // Preto
+        assert_eq!(bars[1], (false, 2)); // Branco
+        assert_eq!(bars[2], (true, 2)); // Preto
+        assert_eq!(bars[3], (false, 1)); // Branco
     }
 
     #[test]
@@ -268,8 +326,6 @@ mod tests {
         }
 
         let results = detect_codes(&image).unwrap();
-        // Por enquanto, esperamos que não decodifique nada específico
-        // pois as implementações específicas ainda não estão prontas
-        assert!(results.is_empty() || !results.is_empty());
+        assert!(!results.is_empty());
     }
 }
