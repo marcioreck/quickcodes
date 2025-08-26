@@ -1,2 +1,2 @@
-createSrcSidebar('[["quickcodes",["",[["exporters",[],["mod.rs","pdf.rs","png.rs","svg.rs"]],["generators",[],["aztec.rs","codabar.rs","code128.rs","code39.rs","datamatrix.rs","ean13.rs","itf14.rs","mod.rs","pdf417.rs","qr.rs","upc.rs"]],["types",[],["mod.rs"]]],["c_api.rs","lib.rs"]]]]');
-//{"start":19,"fragment_lengths":[267]}
+createSrcSidebar('[["quickcodes",["",[["exporters",[],["mod.rs","pdf.rs","png.rs","svg.rs"]],["generators",[],["aztec.rs","codabar.rs","code128.rs","code39.rs","datamatrix.rs","ean13.rs","itf14.rs","mod.rs","pdf417.rs","qr.rs","upc.rs"]],["readers",[],["decoder.rs","detector.rs","image_processing.rs","mod.rs"]],["types",[],["mod.rs"]]],["c_api.rs","lib.rs"]]]]');
+//{"start":19,"fragment_lengths":[342]}
