@@ -1,2 +1,5 @@
 /target
 cpp/build/
+node_modules/
+nodejs/target/
+nodejs/node_modules/

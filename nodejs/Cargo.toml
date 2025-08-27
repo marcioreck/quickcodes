@@ -1,0 +1,21 @@
+[package]
+edition = "2021"
+name = "quickcodes-node"
+version = "0.1.0"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# N-API binding
+napi = { version = "3.2.4", features = ["napi4"] }
+napi-derive = "3.2.4"
+
+# Core QuickCodes
+quickcodes = { path = "..", features = ["readers"] }
+
+# Error handling
+anyhow = "1.0"
+
+[build-dependencies]
+napi-build = "2"

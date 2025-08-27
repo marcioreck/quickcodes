@@ -1,0 +1,61 @@
+{
+  "name": "quickcodes-node",
+  "version": "0.1.0",
+  "description": "QuickCodes - Universal Barcode & QR Toolkit for Node.js",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "quickcodes",
+    "triples": {
+      "defaults": true,
+      "additional": [
+        "x86_64-unknown-linux-musl",
+        "aarch64-unknown-linux-gnu",
+        "i686-pc-windows-msvc",
+        "armv7-unknown-linux-gnueabihf"
+      ]
+    }
+  },
+  "engines": {
+    "node": ">= 14"
+  },
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "node test.js",
+    "universal": "napi universal",
+    "version": "napi version"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marcioreck/quickcodes.git"
+  },
+  "keywords": [
+    "barcode",
+    "qr",
+    "qrcode", 
+    "datamatrix",
+    "pdf417",
+    "aztec",
+    "code128",
+    "ean13",
+    "upca",
+    "code39",
+    "itf14",
+    "codabar",
+    "rust",
+    "napi",
+    "nodejs"
+  ],
+  "author": "Márcio Reck",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/marcioreck/quickcodes/issues"
+  },
+  "homepage": "https://github.com/marcioreck/quickcodes#readme"
+}
