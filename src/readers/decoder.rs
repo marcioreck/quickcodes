@@ -429,7 +429,8 @@ fn extract_itf14_digits(bars: &[bool], start_pos: usize) -> Option<String> {
     None
 }
 
-/// Decodifica uma região específica da imagem
+/// Decodifica uma região específica detectada na imagem
+#[allow(dead_code)]
 fn decode_region(image: &GrayImage, detection: &DetectionResult) -> Result<Option<ReadResult>> {
     // Extrair região
     let region_image = detection.region.extract(image)?;
@@ -791,12 +792,14 @@ fn extract_datamatrix_data(_image: &GrayImage, l_patterns: &[(u32, u32)]) -> Res
 }
 
 /// Decodifica um código UPC-A
+#[allow(dead_code)]
 fn decode_upca(_image: &GrayImage) -> Result<Option<ReadResult>> {
     // TODO: Implementar decodificação UPC-A
     Ok(None)
 }
 
 /// Decodifica um código Codabar
+#[allow(dead_code)]
 fn decode_codabar(_image: &GrayImage) -> Result<Option<ReadResult>> {
     // TODO: Implementar decodificação Codabar
     Ok(None)

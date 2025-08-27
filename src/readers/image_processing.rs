@@ -21,6 +21,7 @@ pub(crate) struct Region {
 }
 
 impl Region {
+    #[allow(dead_code)]
     pub fn new(x: u32, y: u32, width: u32, height: u32) -> Self {
         Self { x, y, width, height }
     }

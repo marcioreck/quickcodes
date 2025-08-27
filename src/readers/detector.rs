@@ -5,13 +5,15 @@ use image::GrayImage;
 
 /// Resultado da detecção de um código
 #[derive(Debug)]
+#[allow(dead_code)]
 pub(crate) struct DetectionResult {
     pub region: Region,
     pub barcode_type: BarcodeType,
     pub confidence: f32,
 }
 
-/// Detecta códigos em uma imagem
+/// Detecta códigos na imagem e retorna regiões de interesse
+#[allow(dead_code)]
 pub(crate) fn detect_codes(image: &GrayImage) -> Result<Vec<DetectionResult>> {
     // Encontrar regiões candidatas
     let regions = find_regions(image)?;
@@ -37,7 +39,8 @@ pub(crate) fn detect_codes(image: &GrayImage) -> Result<Vec<DetectionResult>> {
     Ok(results)
 }
 
-/// Detecta códigos 2D em uma região
+/// Detecta códigos 2D em uma região específica
+#[allow(dead_code)]
 fn detect_2d(image: &GrayImage, region: &Region) -> Result<Option<DetectionResult>> {
     // Procurar padrões finder para QR Code
     if let Some(confidence) = find_qr_patterns(image)? {
@@ -61,7 +64,8 @@ fn detect_2d(image: &GrayImage, region: &Region) -> Result<Option<DetectionResul
     Ok(None)
 }
 
-/// Detecta códigos 1D em uma região
+/// Detecta códigos 1D em uma região específica
+#[allow(dead_code)]
 fn detect_1d(image: &GrayImage, region: &Region) -> Result<Option<DetectionResult>> {
     // Análise de linhas de varredura
     let scan_lines = get_scan_lines(image);
@@ -98,7 +102,8 @@ fn detect_1d(image: &GrayImage, region: &Region) -> Result<Option<DetectionResul
     Ok(None)
 }
 
-/// Obtém linhas de varredura de uma imagem
+/// Extrai linhas de varredura da imagem para análise 1D
+#[allow(dead_code)]
 fn get_scan_lines(image: &GrayImage) -> Vec<Vec<u8>> {
     let mut lines = Vec::new();
     let height = image.height();
@@ -128,7 +133,8 @@ fn get_scan_lines(image: &GrayImage) -> Vec<Vec<u8>> {
     lines
 }
 
-/// Detecta padrões de barras em uma linha
+/// Detecta padrões de barras e espaços em uma linha
+#[allow(dead_code)]
 fn detect_bars(line: &[u8]) -> Result<Vec<u8>> {
     let mut bars = Vec::new();
     let threshold = 128u8;
@@ -159,7 +165,8 @@ fn detect_bars(line: &[u8]) -> Result<Vec<u8>> {
     Ok(bars)
 }
 
-/// Tenta decodificar como EAN-13
+/// Tenta decodificar um padrão EAN-13
+#[allow(dead_code)]
 fn try_decode_ean13(_bars: &[u8]) -> Result<Option<f32>> {
     // TODO: Implementar lógica de detecção EAN-13
     // Por enquanto, retorna None
@@ -167,6 +174,7 @@ fn try_decode_ean13(_bars: &[u8]) -> Result<Option<f32>> {
 }
 
 /// Tenta decodificar como Code128
+#[allow(dead_code)]
 fn try_decode_code128(_bars: &[u8]) -> Result<Option<f32>> {
     // TODO: Implementar lógica de detecção Code128
     // Por enquanto, retorna None
@@ -174,6 +182,7 @@ fn try_decode_code128(_bars: &[u8]) -> Result<Option<f32>> {
 }
 
 /// Procura padrões finder do QR Code
+#[allow(dead_code)]
 fn find_qr_patterns(image: &GrayImage) -> Result<Option<f32>> {
     // Implementação básica: procura por padrões quadrados pretos
     let width = image.width();
@@ -202,6 +211,7 @@ fn find_qr_patterns(image: &GrayImage) -> Result<Option<f32>> {
 }
 
 /// Procura padrões DataMatrix
+#[allow(dead_code)]
 fn find_datamatrix_patterns(image: &GrayImage) -> Result<Option<f32>> {
     // Implementação básica similar ao QR
     let width = image.width();
