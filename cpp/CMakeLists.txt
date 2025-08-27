@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include_directories(include)
 
 # Find the QuickCodes library
-find_library(QUICKCODES_LIB quickcodes PATHS /usr/local/lib)
+find_library(QUICKCODES_LIB quickcodes PATHS ../target/release /usr/local/lib)
 
 # Create the test executable
 add_executable(test_quickcodes test/test.cpp)
