@@ -1,8 +1,24 @@
-/target
+# Rust build outputs
+/target/
+Cargo.lock
+*.pdb
+
+# C++ build outputs  
 cpp/build/
+cpp/examples/output/
+
+# Node.js
 node_modules/
 nodejs/target/
 nodejs/node_modules/
+*.node
+
+# .NET build outputs
+**/bin/
+**/obj/
+*.dll
+*.pdb
+*.exe
 
 # Python
 .venv/
@@ -10,6 +26,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.so
 .Python
 env/
 venv/
@@ -21,3 +38,34 @@ htmlcov/
 dist/
 build/
 *.egg-info/
+
+# Go build outputs
+go/quickcodes/*.h
+go/quickcodes/*.so
+go/quickcodes/*.dll
+go/quickcodes/*.dylib
+
+# Test outputs and generated files
+examples/output/*.png
+examples/output/*.svg
+examples/output/*.pdf
+examples/output/test_*
+examples/output/demo_*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary and backup files
+*.tmp
+*.temp
+*.bak
+*.orig
+*.log

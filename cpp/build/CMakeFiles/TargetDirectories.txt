@@ -1,3 +1,0 @@
-/home/marcioreck/dev/quickcodes/cpp/build/CMakeFiles/test_quickcodes.dir
-/home/marcioreck/dev/quickcodes/cpp/build/CMakeFiles/edit_cache.dir
-/home/marcioreck/dev/quickcodes/cpp/build/CMakeFiles/rebuild_cache.dir

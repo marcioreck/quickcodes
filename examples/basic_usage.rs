@@ -3,7 +3,9 @@
 use quickcodes::{generate, generate_to_file, BarcodeType, ExportFormat};
 use std::fs;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+type BoxError = Box<dyn std::error::Error>;
+
+fn main() -> Result<(), BoxError> {
     println!("🚀 QuickCodes - Basic Usage Examples\n");
 
     // Example 1: Generate QR Code as SVG

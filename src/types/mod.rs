@@ -137,6 +137,9 @@ pub enum BarcodeModules {
     Matrix(Vec<Vec<bool>>),
 }
 
+// Type alias to reduce complexity warnings
+pub type BarcodeMatrix = Vec<Vec<bool>>;
+
 impl BarcodeModules {
     pub fn new_linear(width: usize) -> Self {
         BarcodeModules::Linear(vec![false; width])
@@ -180,7 +183,7 @@ impl BarcodeModules {
         }
     }
 
-    /// Retorna os módulos como um vetor linear (1D)
+    /// Retorna os módulos como um array linear (1D)
     pub fn as_linear(&self) -> Option<&Vec<bool>> {
         match self {
             BarcodeModules::Linear(data) => Some(data),
@@ -189,7 +192,7 @@ impl BarcodeModules {
     }
 
     /// Retorna os módulos como uma matriz (2D)
-    pub fn as_matrix(&self) -> Option<&Vec<Vec<bool>>> {
+    pub fn as_matrix(&self) -> Option<&BarcodeMatrix> {
         match self {
             BarcodeModules::Linear(_) => None,
             BarcodeModules::Matrix(data) => Some(data),

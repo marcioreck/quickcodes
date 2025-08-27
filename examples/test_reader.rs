@@ -1,7 +1,9 @@
 use quickcodes::{read_from_file, read_all_from_file};
 use std::path::Path;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+type BoxError = Box<dyn std::error::Error>;
+
+fn main() -> Result<(), BoxError> {
     println!("🔍 Testing QuickCodes Reader with QR Code images");
     println!("================================================");
 

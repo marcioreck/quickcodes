@@ -74,8 +74,8 @@ fn generate_pdf417_matrix(data: &str, config: &PDF417Config) -> Result<Vec<Vec<b
     // Generate basic pattern (placeholder)
     for (row_idx, row) in matrix.iter_mut().enumerate() {
         // Start pattern (8 modules)
-        for i in 0..8 {
-            row[i] = (i + row_idx) % 2 == 0;
+        for (i, cell) in row.iter_mut().enumerate().take(8) {
+            *cell = (i + row_idx) % 2 == 0;
         }
 
         // Data area (simplified encoding)
@@ -122,7 +122,7 @@ fn calculate_rows(data_len: usize, columns: usize, error_level: u8) -> usize {
     let rows = (total_codewords + columns - 1) / columns; // Ceiling division
 
     // PDF417 must have 3-90 rows
-    rows.max(3).min(90)
+    rows.clamp(3, 90)
 }
 
 #[cfg(test)]
@@ -175,17 +175,17 @@ mod tests {
 
         // PDF417 should have 3-90 rows
         assert!(
-            result1 >= 3 && result1 <= 90,
+            (3..=90).contains(&result1),
             "Rows should be 3-90, got {}",
             result1
         );
         assert!(
-            result2 >= 3 && result2 <= 90,
+            (3..=90).contains(&result2),
             "Rows should be 3-90, got {}",
             result2
         );
         assert!(
-            result3 >= 3 && result3 <= 90,
+            (3..=90).contains(&result3),
             "Rows should be 3-90, got {}",
             result3
         );

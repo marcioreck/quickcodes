@@ -187,7 +187,7 @@ pub fn read_all_from_file<P: AsRef<std::path::Path>>(
 ) -> AnyhowResult<Vec<ReadResult>> {
     #[cfg(feature = "readers")]
     {
-        Ok(readers::read_from_file(_image_path)?)
+        readers::read_from_file(_image_path)
     }
 
     #[cfg(not(feature = "readers"))]

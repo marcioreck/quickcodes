@@ -7,7 +7,33 @@ use image::GrayImage;
 #[cfg(feature = "readers")]
 use rqrr::PreparedImage;
 
-/// Função principal que decodifica todos os códigos de barras de uma imagem
+// Type aliases para reduzir complexidade
+type CornerList = Vec<(u32, u32)>;
+
+/// Função principal que decodifica todos os códigos de barr/// Encontra padrão de início Code39 ('*')
+fn find_code39_start_pattern(bars: &[bool]) -> Option<usize> {
+    // Code39 '*' tem padrão específico
+    (0..bars.len().saturating_sub(13)).find(|&i| has_code39_start_pattern(&bars[i..i+13]))
+}
+
+/// Verifica padrão de início Code39
+fn has_code39_start_pattern(segment: &[bool]) -> bool {
+    // Implementação simplificada para '*'
+    let transitions = count_transitions(segment);
+    (8..=12).contains(&transitions)
+}
+
+/// Conta transições preto/branco
+fn count_transitions(bars: &[bool]) -> usize {
+    let mut transitions = 0;
+    for i in 1..bars.len() {
+        if bars[i] != bars[i-1] {
+            transitions += 1;
+        }
+    }
+    transitions
+}
+
 pub(crate) fn decode_all(image: &GrayImage) -> Result<Vec<ReadResult>> {
     let mut all_results = Vec::new();
     
@@ -307,12 +333,7 @@ fn line_to_bars(line: &[u8]) -> Vec<bool> {
 
 /// Encontra padrão de início EAN-13 (101)
 fn find_ean13_start_pattern(bars: &[bool]) -> Option<usize> {
-    for i in 0..bars.len().saturating_sub(3) {
-        if bars[i] && !bars[i+1] && bars[i+2] {
-            return Some(i);
-        }
-    }
-    None
+    (0..bars.len().saturating_sub(3)).find(|&i| bars[i] && !bars[i+1] && bars[i+2])
 }
 
 /// Extrai dígitos EAN-13 (implementação simplificada)
@@ -337,19 +358,14 @@ fn extract_ean13_digits(bars: &[bool], start_pos: usize) -> Option<String> {
 fn find_code128_start_pattern(bars: &[bool]) -> Option<usize> {
     // Code128 tem padrões de início específicos (Start A, B, C)
     // Implementação simplificada
-    for i in 0..bars.len().saturating_sub(11) {
-        if has_code128_start_pattern(&bars[i..i+11]) {
-            return Some(i);
-        }
-    }
-    None
+    (0..bars.len().saturating_sub(11)).find(|&i| has_code128_start_pattern(&bars[i..i+11]))
 }
 
 /// Verifica se há padrão de início Code128
 fn has_code128_start_pattern(segment: &[bool]) -> bool {
     // Implementação muito simplificada
     let black_count = segment.iter().filter(|&&b| b).count();
-    black_count >= 4 && black_count <= 7
+    (4..=7).contains(&black_count)
 }
 
 /// Extrai dados Code128
@@ -365,35 +381,6 @@ fn extract_code128_data(bars: &[bool], start_pos: usize) -> Option<String> {
     None
 }
 
-/// Encontra padrão de início Code39 (*)
-fn find_code39_start_pattern(bars: &[bool]) -> Option<usize> {
-    // Code39 '*' tem padrão específico
-    for i in 0..bars.len().saturating_sub(13) {
-        if has_code39_start_pattern(&bars[i..i+13]) {
-            return Some(i);
-        }
-    }
-    None
-}
-
-/// Verifica padrão de início Code39
-fn has_code39_start_pattern(segment: &[bool]) -> bool {
-    // Implementação simplificada para '*'
-    let transitions = count_transitions(segment);
-    transitions >= 8 && transitions <= 12
-}
-
-/// Conta transições preto/branco
-fn count_transitions(bars: &[bool]) -> usize {
-    let mut transitions = 0;
-    for i in 1..bars.len() {
-        if bars[i] != bars[i-1] {
-            transitions += 1;
-        }
-    }
-    transitions
-}
-
 /// Extrai dados Code39
 fn extract_code39_data(bars: &[bool], start_pos: usize) -> Option<String> {
     // Implementação simplificada
@@ -406,12 +393,7 @@ fn extract_code39_data(bars: &[bool], start_pos: usize) -> Option<String> {
 /// Encontra padrão de início ITF-14
 fn find_itf14_start_pattern(bars: &[bool]) -> Option<usize> {
     // ITF-14 começa com padrão específico
-    for i in 0..bars.len().saturating_sub(8) {
-        if has_itf14_start_pattern(&bars[i..i+8]) {
-            return Some(i);
-        }
-    }
-    None
+    (0..bars.len().saturating_sub(8)).find(|&i| has_itf14_start_pattern(&bars[i..i+8]))
 }
 
 /// Verifica padrão de início ITF-14
@@ -565,7 +547,7 @@ fn decode_qr_pattern(image: &GrayImage) -> Result<Option<String>> {
 }
 
 /// Encontra padrões finder do QR Code (implementação simplificada)
-fn find_qr_finder_patterns(image: &GrayImage) -> Result<Vec<(u32, u32)>> {
+fn find_qr_finder_patterns(image: &GrayImage) -> Result<CornerList> {
     let mut patterns = Vec::new();
     let width = image.width();
     let height = image.height();
@@ -699,7 +681,7 @@ fn decode_datamatrix_pattern(image: &GrayImage) -> Result<Option<String>> {
 }
 
 /// Encontra padrões L do DataMatrix
-fn find_datamatrix_l_patterns(image: &GrayImage) -> Result<Vec<(u32, u32)>> {
+fn find_datamatrix_l_patterns(image: &GrayImage) -> Result<CornerList> {
     let mut patterns = Vec::new();
     let width = image.width();
     let height = image.height();

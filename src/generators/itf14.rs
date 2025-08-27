@@ -23,7 +23,7 @@ fn calculate_check_digit(data: &str) -> u8 {
         // Posições pares têm peso 3, ímpares têm peso 1
         sum += if i % 2 == 0 { digit * 3 } else { digit };
     }
-    ((10 - (sum % 10)) % 10) as u8
+    (10 - (sum % 10)) % 10
 }
 
 /// Gera um código de barras ITF-14

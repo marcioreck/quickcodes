@@ -91,13 +91,7 @@ fn export_matrix_png(barcode: &Barcode, matrix: &[Vec<bool>]) -> Result<Vec<u8>>
                 let start_y = margin + (row as u32 * module_size);
 
                 // Fill the module rectangle
-                for y in start_y..(start_y + module_size) {
-                    for x in start_x..(start_x + module_size) {
-                        if x < total_width && y < total_height {
-                            img.put_pixel(x, y, Rgb([0, 0, 0]));
-                        }
-                    }
-                }
+                draw_module(&mut img, start_x, start_y, module_size, total_width, total_height);
             }
         }
     }
@@ -110,6 +104,16 @@ fn export_matrix_png(barcode: &Barcode, matrix: &[Vec<bool>]) -> Result<Vec<u8>>
         .map_err(|e| QuickCodesError::ExportError(format!("PNG export failed: {}", e)))?;
 
     Ok(buffer)
+}
+
+fn draw_module(img: &mut RgbImage, start_x: u32, start_y: u32, module_size: u32, total_width: u32, total_height: u32) {
+    for y in start_y..(start_y + module_size) {
+        for x in start_x..(start_x + module_size) {
+            if x < total_width && y < total_height {
+                img.put_pixel(x, y, Rgb([0, 0, 0]));
+            }
+        }
+    }
 }
 
 #[cfg(all(test, feature = "png"))]

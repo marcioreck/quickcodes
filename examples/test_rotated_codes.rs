@@ -50,7 +50,7 @@ fn main() -> Result<()> {
         // Tentar ler o código rotacionado
         println!("   📖 Lendo código rotacionado...");
         
-        match read_from_file(&format!("examples/output/{}", filename)) {
+        match read_from_file(format!("examples/output/{}", filename)) {
             Ok(result) => {
                 println!("   ✅ Sucesso! Tipo: {:?}, Dados: {}", result.barcode_type, result.data);
                 
@@ -66,7 +66,7 @@ fn main() -> Result<()> {
         }
         
         // Testar read_all_from_file também
-        match read_all_from_file(&format!("examples/output/{}", filename)) {
+        match read_all_from_file(format!("examples/output/{}", filename)) {
             Ok(results) => {
                 println!("   📊 read_all_from_file encontrou {} código(s)", results.len());
                 for (i, code) in results.iter().enumerate() {

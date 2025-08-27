@@ -79,8 +79,8 @@ fn calculate_datamatrix_size(data_len: usize) -> usize {
 /// Generate finder patterns (L-shaped solid borders)
 fn generate_finder_patterns(matrix: &mut [Vec<bool>], size: usize) {
     // Left border (solid line)
-    for y in 0..size {
-        matrix[y][0] = true;
+    for row in matrix.iter_mut().take(size) {
+        row[0] = true;
     }
 
     // Bottom border (solid line)
@@ -110,15 +110,13 @@ fn fill_data_area(matrix: &mut [Vec<bool>], data: &[u8], size: usize) {
             let x = i;
             let y = diagonal - i;
 
-            if x < size && y < size && x > 0 && y > 0 && x < size - 1 && y < size - 1 {
-                if bit_index < total_bits {
-                    let byte_idx = bit_index / 8;
-                    let bit_pos = 7 - (bit_index % 8);
+            if x < size && y < size && x > 0 && y > 0 && x < size - 1 && y < size - 1 && bit_index < total_bits {
+                let byte_idx = bit_index / 8;
+                let bit_pos = 7 - (bit_index % 8);
 
-                    if byte_idx < data.len() {
-                        matrix[y][x] = (data[byte_idx] >> bit_pos) & 1 == 1;
-                        bit_index += 1;
-                    }
+                if byte_idx < data.len() {
+                    matrix[y][x] = (data[byte_idx] >> bit_pos) & 1 == 1;
+                    bit_index += 1;
                 }
             }
         }

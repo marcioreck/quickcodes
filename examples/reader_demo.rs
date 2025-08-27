@@ -1,7 +1,9 @@
 use quickcodes::{generate_to_file, read_from_file, read_all_from_file, BarcodeType};
 use std::path::Path;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+type BoxError = Box<dyn std::error::Error>;
+
+fn main() -> Result<(), BoxError> {
     println!("🔍 QuickCodes Reader Demo - Reading Generated Barcodes");
     println!("=====================================================");
 

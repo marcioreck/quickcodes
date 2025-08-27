@@ -1,3 +1,5 @@
+#![allow(clippy::type_complexity, clippy::too_many_arguments, clippy::excessive_nesting, clippy::manual_flatten)]
+
 use ::image::{self as image_crate, imageops, GenericImageView};
 use chrono::Local;
 use printpdf::*;

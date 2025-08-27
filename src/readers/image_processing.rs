@@ -190,8 +190,8 @@ fn detect_barcode_corners(image: &GrayImage) -> Result<Vec<Corner>> {
 
 /// Verifica se um canto está em contexto de código de barras
 fn is_corner_in_barcode_context(image: &GrayImage, corner: &Corner) -> bool {
-    let x = corner.x as u32;
-    let y = corner.y as u32;
+    let x = corner.x;
+    let y = corner.y;
     
     // Verificar se está dentro dos limites
     if x < 10 || y < 10 || x >= image.width() - 10 || y >= image.height() - 10 {
@@ -364,16 +364,14 @@ fn images_are_similar(img1: &GrayImage, img2: &GrayImage) -> bool {
 
 /// Encontra regiões que podem conter códigos de barras
 pub(crate) fn find_regions(image: &GrayImage) -> Result<Vec<Region>> {
-    let mut regions = Vec::new();
-
     // Por enquanto, retorna a imagem inteira como uma região
     // TODO: Implementar detecção de regiões usando análise de componentes conectados
-    regions.push(Region {
+    let regions = vec![Region {
         x: 0,
         y: 0,
         width: image.width(),
         height: image.height(),
-    });
+    }];
 
     Ok(regions)
 }

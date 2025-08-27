@@ -5,7 +5,9 @@
 
 use quickcodes::{generate_to_file, BarcodeType};
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+type BoxError = Box<dyn std::error::Error>;
+
+fn main() -> Result<(), BoxError> {
     println!("🚀 QuickCodes Phase 2 - Advanced 2D Codes Examples");
     println!("================================================");
 

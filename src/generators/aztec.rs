@@ -95,10 +95,10 @@ fn generate_finder_pattern(matrix: &mut [Vec<bool>], size: usize) {
         let start = center.saturating_sub(ring);
         let end = (center + ring + 1).min(size);
 
-        for y in start..end {
-            for x in start..end {
-                if y == start || y == end - 1 || x == start || x == end - 1 {
-                    matrix[y][x] = is_filled;
+        for (y_idx, row) in matrix.iter_mut().enumerate().take(end).skip(start) {
+            for (x_idx, cell) in row.iter_mut().enumerate().take(end).skip(start) {
+                if y_idx == start || y_idx == end - 1 || x_idx == start || x_idx == end - 1 {
+                    *cell = is_filled;
                 }
             }
         }
@@ -198,8 +198,8 @@ fn get_spiral_positions(center: usize, radius: usize, size: usize) -> Vec<(usize
 
 /// Check if position is available for data (not finder pattern or reference grid)
 fn is_data_position(x: usize, y: usize, center: usize, compact: bool) -> bool {
-    let dx = (x as i32 - center as i32).abs() as usize;
-    let dy = (y as i32 - center as i32).abs() as usize;
+    let dx = (x as i32 - center as i32).unsigned_abs();
+    let dy = (y as i32 - center as i32).unsigned_abs();
 
     // Skip finder pattern area
     if dx <= 5 && dy <= 5 {
@@ -290,22 +290,22 @@ mod tests {
 
         // Verify they are within valid ranges
         assert!(
-            result1 >= 1 && result1 <= 4,
+            (1..=4).contains(&result1),
             "Compact layers should be 1-4, got {}",
             result1
         );
         assert!(
-            result2 >= 1 && result2 <= 4,
+            (1..=4).contains(&result2),
             "Compact layers should be 1-4, got {}",
             result2
         );
         assert!(
-            result3 >= 1 && result3 <= 32,
+            (1..=32).contains(&result3),
             "Full layers should be 1-32, got {}",
             result3
         );
         assert!(
-            result4 >= 1 && result4 <= 32,
+            (1..=32).contains(&result4),
             "Full layers should be 1-32, got {}",
             result4
         );
@@ -319,9 +319,9 @@ mod tests {
         // Check that center has some pattern
         let center = 10;
         let mut has_pattern = false;
-        for y in (center - 5)..=(center + 5) {
-            for x in (center - 5)..=(center + 5) {
-                if matrix[y][x] {
+        for row in matrix.iter().take(center + 5 + 1).skip(center - 5) {
+            for cell in row.iter().take(center + 5 + 1).skip(center - 5) {
+                if *cell {
                     has_pattern = true;
                     break;
                 }
