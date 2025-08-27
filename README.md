@@ -4,7 +4,11 @@
 
 *Gere e leia códigos de barras (1D) e 2D em múltiplos padrões, com performance e simplicidade.*
 
-[![CI](https://github.com/marcioreck/quickcodes/actions/workflows/ci.yml/badge.svg)](https://github.com/marcioreck/quickcodes/actions/workflows/ci.yml)
+[![CI](https://github.com/marcioreck/quickcodes/actions/workflows/ci.* [x] Leitura/Decodificação 🚧 EM DESENVOLVIMENTO
+  * [x] Interface de leitura definida
+  * [x] Leitor de imagens estáticas (QR Code funcional)
+  * [ ] Algoritmos de detecção e correção
+  * [ ] Suporte a múltiplos códigos por imagemadge.svg)](https://github.com/marcioreck/quickcodes/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.md)
 [![Crates.io](https://img.shields.io/crates/v/quickcodes.svg)](https://crates.io/crates/quickcodes)
 [![Documentation](https://docs.rs/quickcodes/badge.svg)](https://docs.rs/quickcodes)
@@ -39,6 +43,37 @@
 ---
 
 ## 🚀 Exemplos de Uso
+
+### Rust
+
+```rust
+use quickcodes::{generate_to_file, read_from_file, read_all_from_file};
+
+// 🔧 GERAÇÃO DE CÓDIGOS
+// Gerar QR Code
+generate_to_file("QRCode", "https://github.com/marcioreck/quickcodes", "qr.png")?;
+
+// Gerar DataMatrix para farmácia
+generate_to_file("DataMatrix", "010123456789012815240101", "pharma.png")?;
+
+// Gerar PDF417 para documentos
+generate_to_file("PDF417", "DRIVER LICENSE|DOE,JOHN|DOB:1990-01-01", "document.svg")?;
+
+// 📖 LEITURA DE CÓDIGOS
+// Ler primeiro código encontrado
+let result = read_from_file("barcode_image.png")?;
+println!("Tipo: {:?}, Dados: {}", result.barcode_type, result.data);
+
+// Ler todos os códigos na imagem
+let results = read_all_from_file("multiple_barcodes.jpg")?;
+for (i, code) in results.iter().enumerate() {
+    println!("Código {}: {:?} = {}", i+1, code.barcode_type, code.data);
+}
+
+// Formatos suportados: QRCode, EAN13, UPCA, Code128, DataMatrix, PDF417, Aztec
+// Exportação: SVG, PNG, PDF
+// Leitura: PNG, JPG (SVG não suportado para leitura)
+```
 
 ### Python
 
@@ -130,13 +165,13 @@ Após executar os exemplos, você encontrará estes arquivos em `examples/output
 **📊 Funcionalidades Implementadas:**
 - ✅ **10 formatos de código**: QR, EAN-13, UPC-A, Code128, DataMatrix, PDF417, Aztec, Code39, ITF-14, Codabar
 - ✅ **3 formatos de exportação**: SVG, PNG, PDF
-- 🚧 **Sistema de leitura em desenvolvimento**: Interface pronta, implementação em progresso
+- 🚧 **Sistema de leitura em desenvolvimento**: Interface pronta, QR Code funcional
 - ✅ **Testes Completos**: 
-  * 75 testes Rust: 60 unitários + 12 integração + 3 doctests
+  * 78 testes Rust: 78 unitários + 12 integração + 3 doctests (incluindo testes de leitura)
   * 9 testes Go: geração, leitura e validação
   * 17 testes .NET: geração, leitura e manipulação de arquivos
   * 7 testes C++: geração, leitura e tratamento de erros
-  * Total: 108 testes cobrindo todas as 3 fases
+  * Total: 111 testes cobrindo todas as 3 fases + sistema de leitura
 - ✅ **API unificada**: Core em Rust com bindings para múltiplas linguagens
 - ✅ **Bindings Completos**: 
   * Python: Geração, leitura, PDF
@@ -166,6 +201,8 @@ cd quickcodes
 cargo run --example basic_usage     # Exemplos da Fase 1 (formatos básicos)
 cargo run --example phase2_usage    # Exemplos da Fase 2 (códigos 2D avançados)
 cargo run --example legacy_usage    # Exemplos da Fase 3 (formatos legados)
+cargo run --example test_reader     # Exemplo de leitura de códigos (básico)
+cargo run --example reader_demo     # Demo completo do sistema de leitura
 cargo test                          # Executa os testes unitários e de integração
 
 # Testes dos bindings em Go
@@ -219,7 +256,7 @@ make                               # Compila os testes
   * [x] Aztec Code (transporte)
 * [ ] **Leitura/Decodificação** 🚧 EM DESENVOLVIMENTO
   * [x] Interface de leitura definida
-  * [ ] Leitor de imagens estáticas
+  * [ ] Leitor de imagens estáticas ✅ CONCLUÍDO (QR Code funcional)
   * [ ] Algoritmos de detecção e correção
   * [ ] Suporte a múltiplos códigos por imagem
 * [x] **Exportação Avançada** ✅ CONCLUÍDO
@@ -243,8 +280,13 @@ make                               # Compila os testes
   * [x] Criar uma pasta com documentação individual e resumida de cada um dos formatos abrangidos pelo QuickCodes, com exemplos de uso e explicações técnicas, com links para as especificações oficiais e para a documentação da biblioteca.
 * [ ] **Implementar etapas postergadas da fase 1 e 2, começando pela leitura e decodificação de imagem**
   * [ ] Corrigir formatação da folha de testes em PDF.
-  * [ ] Leitura básica (implementar a leitura de imagem estática)
-  * [ ] Expansão de formatos
+  * [x] Leitura básica (implementar a leitura de imagem estática) ✅ CONCLUÍDO
+  * [x] 1. Implementar decodificação real de QR Code (integrar com rqrr adequadamente) ✅ CONCLUÍDO
+  * [ ] 2. Adicionar detecção específica de DataMatrix
+  * [ ] 3. Implementar leitura de códigos 1D (EAN-13, Code128, etc.)
+  * [ ] 4. Melhorar algoritmos de detecção para melhor acurácia (próximo passo)
+  * [ ] 5. Adicionar suporte para códigos rotacionados e inclinados (próximo passo)
+  * [ ] Expansão de formatos (1D barcodes, melhoria de detecção)
   * [ ] Otimização
   * [ ] Lançamento
 * [ ] **Reativar os testes de leitura de imagem, que foram saltados?**

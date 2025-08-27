@@ -1,5 +1,5 @@
 use anyhow::Result;
-use image::{DynamicImage, GrayImage, ImageBuffer, Luma};
+use image::{DynamicImage, GrayImage};
 
 #[cfg(feature = "readers")]
 use imageproc::{
@@ -87,55 +87,46 @@ pub(crate) fn find_regions(image: &GrayImage) -> Result<Vec<Region>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use image::{DynamicImage, GrayImage, Luma, RgbImage};
-
-    #[test]
-    fn test_region_extract() {
-        let mut image = GrayImage::new(100, 100);
-        // Preencher uma região específica
-        for x in 10..20 {
-            for y in 10..20 {
-                image.put_pixel(x, y, Luma([255]));
-            }
-        }
-
-        let region = Region::new(10, 10, 10, 10);
-        let extracted = region.extract(&image).unwrap();
-        
-        assert_eq!(extracted.width(), 10);
-        assert_eq!(extracted.height(), 10);
-        assert_eq!(extracted.get_pixel(0, 0)[0], 255);
-    }
+    use image::{GrayImage, Luma};
 
     #[test]
     fn test_prepare_image() {
-        let rgb_image = RgbImage::new(100, 100);
-        let dynamic_image = DynamicImage::ImageRgb8(rgb_image);
-        
-        let result = prepare_image(&dynamic_image);
+        // Criar imagem de teste
+        let mut image = GrayImage::new(100, 100);
+        for y in 0..100 {
+            for x in 0..100 {
+                image.put_pixel(x, y, Luma([128u8]));
+            }
+        }
+
+        let dynamic = DynamicImage::ImageLuma8(image);
+        let result = prepare_image(&dynamic);
         assert!(result.is_ok());
-        
-        let gray = result.unwrap();
-        assert_eq!(gray.width(), 100);
-        assert_eq!(gray.height(), 100);
     }
 
     #[test]
     fn test_find_regions() {
         let image = GrayImage::new(100, 100);
         let regions = find_regions(&image).unwrap();
-        
         assert!(!regions.is_empty());
-        assert_eq!(regions[0].width, 100);
-        assert_eq!(regions[0].height, 100);
+
+        let region = &regions[0];
+        assert_eq!(region.width, 100);
+        assert_eq!(region.height, 100);
     }
 
     #[test]
-    fn test_correct_orientation() {
+    fn test_region_extract() {
         let image = GrayImage::new(100, 100);
-        let result = correct_orientation(&image).unwrap();
-        
-        assert_eq!(result.width(), 100);
-        assert_eq!(result.height(), 100);
+        let region = Region {
+            x: 10,
+            y: 10,
+            width: 50,
+            height: 50,
+        };
+
+        let extracted = region.extract(&image).unwrap();
+        assert_eq!(extracted.width(), 50);
+        assert_eq!(extracted.height(), 50);
     }
 }

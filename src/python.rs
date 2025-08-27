@@ -234,21 +234,17 @@ fn read_from_file(image_path: &str) -> PyResult<PyObject> {
         {
             use crate::readers;
             match readers::read_from_file(image_path) {
-                Ok(result) => {
+                Ok(results) => {
+                    if results.is_empty() {
+                        return Err(PyValueError::new_err("No barcodes found in the image"));
+                    }
+                    let result = &results[0];
                     let dict = pyo3::types::PyDict::new(py);
                     dict.set_item("barcode_type", format!("{:?}", result.barcode_type))?;
-                    dict.set_item("data", result.data)?;
+                    dict.set_item("data", &result.data)?;
                     dict.set_item("confidence", result.confidence)?;
-                    if let Some((x, y, w, h)) = result.position {
-                        let pos_dict = pyo3::types::PyDict::new(py);
-                        pos_dict.set_item("x", x)?;
-                        pos_dict.set_item("y", y)?;
-                        pos_dict.set_item("width", w)?;
-                        pos_dict.set_item("height", h)?;
-                        dict.set_item("position", pos_dict)?;
-                    } else {
-                        dict.set_item("position", py.None())?;
-                    }
+                    // Position information not available in current implementation
+                    dict.set_item("position", py.None())?;
                     Ok(dict.into())
                 }
                 Err(e) => Err(PyValueError::new_err(format!("Read failed: {}", e))),
@@ -271,24 +267,16 @@ fn read_all_from_file(image_path: &str) -> PyResult<PyObject> {
         #[cfg(feature = "readers")]
         {
             use crate::readers;
-            match readers::read_all_from_file(image_path) {
+            match readers::read_from_file(image_path) {
                 Ok(results) => {
                     let list = pyo3::types::PyList::empty(py);
                     for result in results {
                         let dict = pyo3::types::PyDict::new(py);
                         dict.set_item("barcode_type", format!("{:?}", result.barcode_type))?;
-                        dict.set_item("data", result.data)?;
+                        dict.set_item("data", &result.data)?;
                         dict.set_item("confidence", result.confidence)?;
-                        if let Some((x, y, w, h)) = result.position {
-                            let pos_dict = pyo3::types::PyDict::new(py);
-                            pos_dict.set_item("x", x)?;
-                            pos_dict.set_item("y", y)?;
-                            pos_dict.set_item("width", w)?;
-                            pos_dict.set_item("height", h)?;
-                            dict.set_item("position", pos_dict)?;
-                        } else {
-                            dict.set_item("position", py.None())?;
-                        }
+                        // Position information not available in current implementation
+                        dict.set_item("position", py.None())?;
                         list.append(dict)?;
                     }
                     Ok(list.into())

@@ -132,9 +132,9 @@ pub fn generate_to_file(
     Ok(())
 }
 
-/// Read first barcode from image file
+/// Read barcode from image file
 ///
-/// Detects and decodes the first barcode found in the image.
+/// Automatically detects and decodes the first barcode found in the image.
 ///
 /// # Arguments
 ///
@@ -142,23 +142,23 @@ pub fn generate_to_file(
 ///
 /// # Returns
 ///
-/// Returns the first decoded barcode
+/// Returns the decoded barcode data and type information
 ///
 /// # Examples
 ///
-/// ```no_run
+/// ```rust
 /// use quickcodes::read_from_file;
 ///
 /// // This example would work if you had an actual barcode image
 /// // let result = read_from_file("barcode.png")?;
 /// // println!("Found {}: {}", result.barcode_type, result.data);
 /// ```
-pub fn read_from_file<P: AsRef<std::path::Path>>(image_path: P) -> AnyhowResult<ReadResult> {
+pub fn read_from_file<P: AsRef<std::path::Path>>(_image_path: P) -> AnyhowResult<ReadResult> {
     #[cfg(feature = "readers")]
     {
-        let results = readers_read_from_file(image_path)?;
+        let results = readers_read_from_file(_image_path)?;
         if results.is_empty() {
-            return Err(anyhow::anyhow!("No barcodes found in image"));
+            return Err(anyhow::anyhow!("No barcodes found in the image"));
         }
         Ok(results.into_iter().next().unwrap())
     }
@@ -183,11 +183,11 @@ pub fn read_from_file<P: AsRef<std::path::Path>>(image_path: P) -> AnyhowResult<
 ///
 /// Returns a vector of all decoded barcodes
 pub fn read_all_from_file<P: AsRef<std::path::Path>>(
-    image_path: P,
+    _image_path: P,
 ) -> AnyhowResult<Vec<ReadResult>> {
     #[cfg(feature = "readers")]
     {
-        Ok(readers::read_from_file(image_path)?)
+        Ok(readers::read_from_file(_image_path)?)
     }
 
     #[cfg(not(feature = "readers"))]
@@ -208,14 +208,10 @@ pub fn read_all_from_file<P: AsRef<std::path::Path>>(
 /// # Returns
 ///
 /// Returns the first decoded barcode
-pub fn read_from_bytes(image_data: &[u8], format: Option<&str>) -> AnyhowResult<ReadResult> {
+pub fn read_from_bytes(_image_data: &[u8], _format: Option<&str>) -> AnyhowResult<ReadResult> {
     #[cfg(feature = "readers")]
     {
-        let results = readers_read_from_bytes(image_data, format)?;
-        if results.is_empty() {
-            return Err(anyhow::anyhow!("No barcodes found in image"));
-        }
-        Ok(results.into_iter().next().unwrap())
+        Ok(readers_read_from_bytes(_image_data, _format)?.remove(0))
     }
 
     #[cfg(not(feature = "readers"))]

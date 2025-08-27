@@ -245,14 +245,18 @@ mod tests {
     fn test_detect_bars() {
         let line = vec![0, 0, 255, 255, 0, 0, 255];
         let bars = detect_bars(&line).unwrap();
-        assert!(bars.len() >= 3);
+        assert_eq!(bars.len(), 4);
+        assert_eq!(bars[0], 2); // Largura da primeira barra preta
+        assert_eq!(bars[1], 2); // Largura do primeiro espaço branco
+        assert_eq!(bars[2], 2); // Largura da segunda barra preta
+        assert_eq!(bars[3], 1); // Largura do segundo espaço branco
     }
 
     #[test]
     fn test_detect_codes_empty_image() {
         let image = GrayImage::new(100, 100);
         let results = detect_codes(&image).unwrap();
-        assert!(results.is_empty() || results[0].confidence < 0.5);
+        assert!(results.is_empty());
     }
 
     #[test]
@@ -267,9 +271,8 @@ mod tests {
             }
         }
 
-        let results = detect_codes(&image).unwrap();
-        // Por enquanto, esperamos que não decodifique nada específico
-        // pois as implementações específicas ainda não estão prontas
-        assert!(results.is_empty() || !results.is_empty());
+        let _results = detect_codes(&image).unwrap();
+        // Com o padrão atual, pode não detectar nada específico
+        // Isso é esperado pois ainda não implementamos decodificação específica
     }
 }

@@ -7,7 +7,7 @@ mod detector;
 mod image_processing;
 
 use crate::types::ReadResult;
-use decoder::decode_image;
+use decoder::decode_all;
 use image_processing::prepare_image;
 
 /// Lê códigos de barras de um arquivo de imagem
@@ -44,7 +44,7 @@ fn read_from_image(image: &DynamicImage) -> Result<Vec<ReadResult>> {
     let processed = prepare_image(image)?;
 
     // Decodificar
-    decode_image(&processed)
+    decode_all(&processed)
 }
 
 #[cfg(test)]

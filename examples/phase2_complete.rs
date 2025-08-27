@@ -64,9 +64,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 println!("      Type: {:?}", result.barcode_type);
                 println!("      Data: {}", result.data);
                 println!("      Confidence: {:.2}", result.confidence);
-                if let Some((x, y, w, h)) = result.position {
-                    println!("      Position: ({}, {}) {}x{}", x, y, w, h);
-                }
+                // Note: Position information is not available in the current ReadResult structure
+                // This would require extending the API to include bounding box coordinates
             }
             Err(e) => {
                 println!("   ⚠️  Could not read barcode: {}", e);
