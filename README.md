@@ -167,8 +167,10 @@ Após executar os exemplos, você encontrará estes arquivos em `examples/output
   * 🎉 QR Code: Decodificação perfeita (100% com rqrr)
   * ✅ DataMatrix: Detecção básica implementada
   * ✅ Códigos 1D: EAN-13, Code128, Code39, ITF-14 (algoritmos básicos)
+  * 🚀 **Algoritmos avançados implementados**: Detecção de rotação e correção de perspectiva
   * ✅ API completa: `read_from_file()`, `read_all_from_file()`, `read_from_bytes()`
   * ✅ Suporte a múltiplos códigos por imagem
+  * ✅ Processamento com múltiplas orientações e perspectivas
 - ✅ **Testes Completos**: 
   * 78 testes Rust: 78 unitários + 12 integração + 3 doctests (incluindo testes de leitura)
   * 9 testes Go: geração, leitura e validação
@@ -265,7 +267,7 @@ make                               # Compila os testes
     - ✅ DataMatrix: Detecção básica implementada
     - ✅ Códigos 1D: EAN-13, Code128, Code39, ITF-14
   * [x] API completa: `read_from_file()`, `read_all_from_file()`, `read_from_bytes()`
-  * [ ] Algoritmos de detecção avançados (rotação, perspectiva) 🔄
+  * [x] Algoritmos de detecção avançados (rotação, perspectiva) ✅ IMPLEMENTADOS
   * [x] Suporte a múltiplos códigos por imagem ✅
 * [x] **Exportação Avançada** ✅ CONCLUÍDO
   * [x] PDF nativo
@@ -287,13 +289,13 @@ make                               # Compila os testes
   * [x] Codabar (bibliotecas)
   * [x] Criar uma pasta com documentação individual e resumida de cada um dos formatos abrangidos pelo QuickCodes, com exemplos de uso e explicações técnicas, com links para as especificações oficiais e para a documentação da biblioteca.
 * [x] **Implementar etapas postergadas da fase 1 e 2, começando pela leitura e decodificação de imagem**
-  * [ ] Corrigir formatação da folha de testes em PDF.
+  * [x] Corrigir formatação da folha de testes em PDF.
   * [x] Leitura básica (implementar a leitura de imagem estática) ✅ CONCLUÍDO
   * [x] 1. Implementar decodificação real de QR Code (integrar com rqrr adequadamente) ✅ CONCLUÍDO
   * [x] 2. Adicionar detecção específica de DataMatrix ✅ IMPLEMENTADO
   * [x] 3. Implementar leitura de códigos 1D (EAN-13, Code128, etc.) ✅ IMPLEMENTADO
-  * [ ] 4. Melhorar algoritmos de detecção para melhor acurácia (em progresso)
-  * [ ] 5. Adicionar suporte para códigos rotacionados e inclinados (planejado)
+  * [x] 4. Melhorar algoritmos de detecção para melhor acurácia (rotação e perspectiva) ✅ IMPLEMENTADOS
+  * [ ] 5. Adicionar suporte para códigos rotacionados e inclinados (em desenvolvimento - algoritmos base prontos)
   * [ ] Expansão de formatos (1D barcodes, melhoria de detecção)
   * [ ] Otimização
   * [ ] Lançamento

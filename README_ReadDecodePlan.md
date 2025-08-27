@@ -12,9 +12,10 @@
 ### 1. Preparação da Imagem
 - [x] Conversão para escala de cinza ✅
 - [x] Binarização adaptativa (Otsu/local) ✅ 
-- [ ] Correção de perspectiva 🔄 (próximo passo)
+- [x] Correção de perspectiva ✅ IMPLEMENTADA
 - [x] Redução de ruído ✅
 - [x] Detecção de bordas ✅
+- [x] **Algoritmos avançados de detecção**: Rotação e perspectiva ✅
 
 ### 2. Detecção de Regiões
 - [x] Detecção de padrões finder (QR, DataMatrix, Aztec) ✅
@@ -67,7 +68,9 @@
 ### 🚧 Em Desenvolvimento
 1. **Melhorias na detecção de DataMatrix**
 2. **Aprimoramento dos algoritmos 1D**
-3. **Detecção de códigos rotacionados/inclinados**
+3. ✅ **Algoritmos avançados implementados**: Detecção de rotação e correção de perspectiva
+4. **Integração completa dos algoritmos avançados no pipeline de leitura**
+5. **Testes com códigos rotacionados e inclinados**
 
 ### 📊 Resultados dos Testes
 - **78 testes unitários**: ✅ PASSANDO

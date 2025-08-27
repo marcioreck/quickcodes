@@ -1,4 +1,5 @@
 use super::detector::{DetectionResult};
+use super::image_processing::{correct_orientation, correct_perspective, detect_and_correct_multiple_orientations};
 use crate::types::{BarcodeType, ReadResult};
 use anyhow::Result;
 use image::GrayImage;
@@ -6,34 +7,127 @@ use image::GrayImage;
 #[cfg(feature = "readers")]
 use rqrr::PreparedImage;
 
-/// Função principal para decodificar códigos de barras de uma imagem
-pub fn decode_all(image: &GrayImage) -> Result<Vec<ReadResult>> {
+/// Função principal que decodifica todos os códigos de barras de uma imagem
+pub(crate) fn decode_all(image: &GrayImage) -> Result<Vec<ReadResult>> {
+    let mut all_results = Vec::new();
+    
+    // Fase 1: Tentar decodificação na imagem original
+    let original_results = decode_single_orientation(image)?;
+    all_results.extend(original_results);
+    
+    // Fase 2: Algoritmos avançados - múltiplas orientações e correções
+    #[cfg(feature = "readers")]
+    {
+        let corrected_images = detect_and_correct_multiple_orientations(image)?;
+        
+        for corrected_image in &corrected_images {
+            // Evitar processar novamente a imagem original
+            if !images_are_equivalent(image, corrected_image) {
+                let corrected_results = decode_single_orientation(corrected_image)?;
+                
+                // Adicionar apenas resultados únicos
+                for result in corrected_results {
+                    if !result_already_exists(&all_results, &result) {
+                        all_results.push(result);
+                    }
+                }
+            }
+        }
+        
+        // Fase 3: Correção de orientação automática
+        let orientation_corrected = correct_orientation(image)?;
+        if !images_are_equivalent(image, &orientation_corrected) {
+            let orientation_results = decode_single_orientation(&orientation_corrected)?;
+            
+            for result in orientation_results {
+                if !result_already_exists(&all_results, &result) {
+                    all_results.push(result);
+                }
+            }
+        }
+        
+        // Fase 4: Correção de perspectiva
+        let perspective_corrected = correct_perspective(image)?;
+        if !images_are_equivalent(image, &perspective_corrected) {
+            let perspective_results = decode_single_orientation(&perspective_corrected)?;
+            
+            for result in perspective_results {
+                if !result_already_exists(&all_results, &result) {
+                    all_results.push(result);
+                }
+            }
+        }
+    }
+    
+    // Ordenar resultados por confiança (maior primeiro)
+    all_results.sort_by(|a, b| b.confidence.partial_cmp(&a.confidence).unwrap());
+    
+    Ok(all_results)
+}
+
+/// Decodifica códigos em uma única orientação de imagem
+fn decode_single_orientation(image: &GrayImage) -> Result<Vec<ReadResult>> {
     let mut results = Vec::new();
     
-    // Tentar decodificar QR Code
-    if let Some(result) = decode_qr(image)? {
-        results.push(result);
+    // Tentar QR Code primeiro (mais comum e rápido)
+    if let Some(qr_result) = decode_qr(image)? {
+        results.push(qr_result);
     }
     
-    // Tentar decodificar DataMatrix
-    if let Some(result) = decode_datamatrix(image)? {
-        results.push(result);
+    // Tentar DataMatrix
+    if let Some(dm_result) = decode_datamatrix(image)? {
+        results.push(dm_result);
     }
     
-    // Tentar decodificar códigos 1D
-    let mut barcode_1d_results = decode_1d_barcodes(image)?;
-    results.append(&mut barcode_1d_results);
+    // Tentar códigos 1D
+    let barcode_1d_results = decode_1d_barcodes(image)?;
+    results.extend(barcode_1d_results);
     
-    // Tentar outros tipos
-    if let Some(result) = decode_pdf417(image)? {
-        results.push(result);
+    // Tentar outros códigos 2D
+    if let Some(pdf417_result) = decode_pdf417(image)? {
+        results.push(pdf417_result);
     }
     
-    if let Some(result) = decode_aztec(image)? {
-        results.push(result);
+    if let Some(aztec_result) = decode_aztec(image)? {
+        results.push(aztec_result);
     }
     
     Ok(results)
+}
+
+/// Verifica se duas imagens são equivalentes
+fn images_are_equivalent(img1: &GrayImage, img2: &GrayImage) -> bool {
+    if img1.width() != img2.width() || img1.height() != img2.height() {
+        return false;
+    }
+    
+    // Comparação rápida: verificar alguns pixels representativos
+    let sample_points = [
+        (img1.width() / 4, img1.height() / 4),
+        (img1.width() / 2, img1.height() / 2),
+        (3 * img1.width() / 4, 3 * img1.height() / 4),
+    ];
+    
+    for &(x, y) in &sample_points {
+        if x < img1.width() && y < img1.height() {
+            let pixel1 = img1.get_pixel(x, y)[0];
+            let pixel2 = img2.get_pixel(x, y)[0];
+            
+            if (pixel1 as i32 - pixel2 as i32).abs() > 20 {
+                return false;
+            }
+        }
+    }
+    
+    true
+}
+
+/// Verifica se um resultado já existe na lista (evita duplicatas)
+fn result_already_exists(results: &[ReadResult], new_result: &ReadResult) -> bool {
+    results.iter().any(|existing| {
+        existing.barcode_type == new_result.barcode_type && 
+        existing.data == new_result.data
+    })
 }
 
 /// Decodifica códigos de barras 1D
@@ -355,13 +449,29 @@ fn decode_region(image: &GrayImage, detection: &DetectionResult) -> Result<Optio
     }
 }
 
-/// Decodifica um QR Code
+/// Decodifica um QR Code com algoritmos avançados
 fn decode_qr(image: &GrayImage) -> Result<Option<ReadResult>> {
-    // Tentar primeiro com rqrr real
+    // Tentar primeiro com rqrr real na imagem original
     #[cfg(feature = "readers")]
     {
         if let Some(result) = decode_qr_with_rqrr(image)? {
             return Ok(Some(result));
+        }
+        
+        // Se falhou na imagem original, tentar com correção de orientação
+        let oriented_image = correct_orientation(image)?;
+        if !images_are_equivalent(image, &oriented_image) {
+            if let Some(result) = decode_qr_with_rqrr(&oriented_image)? {
+                return Ok(Some(result));
+            }
+        }
+        
+        // Tentar com correção de perspectiva
+        let perspective_image = correct_perspective(image)?;
+        if !images_are_equivalent(image, &perspective_image) {
+            if let Some(result) = decode_qr_with_rqrr(&perspective_image)? {
+                return Ok(Some(result));
+            }
         }
     }
     
