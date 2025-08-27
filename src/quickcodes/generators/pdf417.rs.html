@@ -74,8 +74,8 @@
 <a href=#74 id=74 data-nosnippet>74</a>    <span class="comment">// Generate basic pattern (placeholder)
 <a href=#75 id=75 data-nosnippet>75</a>    </span><span class="kw">for </span>(row_idx, row) <span class="kw">in </span>matrix.iter_mut().enumerate() {
 <a href=#76 id=76 data-nosnippet>76</a>        <span class="comment">// Start pattern (8 modules)
-<a href=#77 id=77 data-nosnippet>77</a>        </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">8 </span>{
-<a href=#78 id=78 data-nosnippet>78</a>            row[i] = (i + row_idx) % <span class="number">2 </span>== <span class="number">0</span>;
+<a href=#77 id=77 data-nosnippet>77</a>        </span><span class="kw">for </span>(i, cell) <span class="kw">in </span>row.iter_mut().enumerate().take(<span class="number">8</span>) {
+<a href=#78 id=78 data-nosnippet>78</a>            <span class="kw-2">*</span>cell = (i + row_idx) % <span class="number">2 </span>== <span class="number">0</span>;
 <a href=#79 id=79 data-nosnippet>79</a>        }
 <a href=#80 id=80 data-nosnippet>80</a>
 <a href=#81 id=81 data-nosnippet>81</a>        <span class="comment">// Data area (simplified encoding)
@@ -122,7 +122,7 @@
 <a href=#122 id=122 data-nosnippet>122</a>    </span><span class="kw">let </span>rows = (total_codewords + columns - <span class="number">1</span>) / columns; <span class="comment">// Ceiling division
 <a href=#123 id=123 data-nosnippet>123</a>
 <a href=#124 id=124 data-nosnippet>124</a>    // PDF417 must have 3-90 rows
-<a href=#125 id=125 data-nosnippet>125</a>    </span>rows.max(<span class="number">3</span>).min(<span class="number">90</span>)
+<a href=#125 id=125 data-nosnippet>125</a>    </span>rows.clamp(<span class="number">3</span>, <span class="number">90</span>)
 <a href=#126 id=126 data-nosnippet>126</a>}
 <a href=#127 id=127 data-nosnippet>127</a>
 <a href=#128 id=128 data-nosnippet>128</a><span class="attr">#[cfg(test)]
@@ -175,17 +175,17 @@
 <a href=#175 id=175 data-nosnippet>175</a>
 <a href=#176 id=176 data-nosnippet>176</a>        <span class="comment">// PDF417 should have 3-90 rows
 <a href=#177 id=177 data-nosnippet>177</a>        </span><span class="macro">assert!</span>(
-<a href=#178 id=178 data-nosnippet>178</a>            result1 &gt;= <span class="number">3 </span>&amp;&amp; result1 &lt;= <span class="number">90</span>,
+<a href=#178 id=178 data-nosnippet>178</a>            (<span class="number">3</span>..=<span class="number">90</span>).contains(<span class="kw-2">&amp;</span>result1),
 <a href=#179 id=179 data-nosnippet>179</a>            <span class="string">"Rows should be 3-90, got {}"</span>,
 <a href=#180 id=180 data-nosnippet>180</a>            result1
 <a href=#181 id=181 data-nosnippet>181</a>        );
 <a href=#182 id=182 data-nosnippet>182</a>        <span class="macro">assert!</span>(
-<a href=#183 id=183 data-nosnippet>183</a>            result2 &gt;= <span class="number">3 </span>&amp;&amp; result2 &lt;= <span class="number">90</span>,
+<a href=#183 id=183 data-nosnippet>183</a>            (<span class="number">3</span>..=<span class="number">90</span>).contains(<span class="kw-2">&amp;</span>result2),
 <a href=#184 id=184 data-nosnippet>184</a>            <span class="string">"Rows should be 3-90, got {}"</span>,
 <a href=#185 id=185 data-nosnippet>185</a>            result2
 <a href=#186 id=186 data-nosnippet>186</a>        );
 <a href=#187 id=187 data-nosnippet>187</a>        <span class="macro">assert!</span>(
-<a href=#188 id=188 data-nosnippet>188</a>            result3 &gt;= <span class="number">3 </span>&amp;&amp; result3 &lt;= <span class="number">90</span>,
+<a href=#188 id=188 data-nosnippet>188</a>            (<span class="number">3</span>..=<span class="number">90</span>).contains(<span class="kw-2">&amp;</span>result3),
 <a href=#189 id=189 data-nosnippet>189</a>            <span class="string">"Rows should be 3-90, got {}"</span>,
 <a href=#190 id=190 data-nosnippet>190</a>            result3
 <a href=#191 id=191 data-nosnippet>191</a>        );

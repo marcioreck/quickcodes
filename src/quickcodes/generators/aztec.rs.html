@@ -95,10 +95,10 @@
 <a href=#95 id=95 data-nosnippet>95</a>        <span class="kw">let </span>start = center.saturating_sub(ring);
 <a href=#96 id=96 data-nosnippet>96</a>        <span class="kw">let </span>end = (center + ring + <span class="number">1</span>).min(size);
 <a href=#97 id=97 data-nosnippet>97</a>
-<a href=#98 id=98 data-nosnippet>98</a>        <span class="kw">for </span>y <span class="kw">in </span>start..end {
-<a href=#99 id=99 data-nosnippet>99</a>            <span class="kw">for </span>x <span class="kw">in </span>start..end {
-<a href=#100 id=100 data-nosnippet>100</a>                <span class="kw">if </span>y == start || y == end - <span class="number">1 </span>|| x == start || x == end - <span class="number">1 </span>{
-<a href=#101 id=101 data-nosnippet>101</a>                    matrix[y][x] = is_filled;
+<a href=#98 id=98 data-nosnippet>98</a>        <span class="kw">for </span>(y_idx, row) <span class="kw">in </span>matrix.iter_mut().enumerate().take(end).skip(start) {
+<a href=#99 id=99 data-nosnippet>99</a>            <span class="kw">for </span>(x_idx, cell) <span class="kw">in </span>row.iter_mut().enumerate().take(end).skip(start) {
+<a href=#100 id=100 data-nosnippet>100</a>                <span class="kw">if </span>y_idx == start || y_idx == end - <span class="number">1 </span>|| x_idx == start || x_idx == end - <span class="number">1 </span>{
+<a href=#101 id=101 data-nosnippet>101</a>                    <span class="kw-2">*</span>cell = is_filled;
 <a href=#102 id=102 data-nosnippet>102</a>                }
 <a href=#103 id=103 data-nosnippet>103</a>            }
 <a href=#104 id=104 data-nosnippet>104</a>        }
@@ -198,8 +198,8 @@
 <a href=#198 id=198 data-nosnippet>198</a>
 <a href=#199 id=199 data-nosnippet>199</a><span class="doccomment">/// Check if position is available for data (not finder pattern or reference grid)
 <a href=#200 id=200 data-nosnippet>200</a></span><span class="kw">fn </span>is_data_position(x: usize, y: usize, center: usize, compact: bool) -&gt; bool {
-<a href=#201 id=201 data-nosnippet>201</a>    <span class="kw">let </span>dx = (x <span class="kw">as </span>i32 - center <span class="kw">as </span>i32).abs() <span class="kw">as </span>usize;
-<a href=#202 id=202 data-nosnippet>202</a>    <span class="kw">let </span>dy = (y <span class="kw">as </span>i32 - center <span class="kw">as </span>i32).abs() <span class="kw">as </span>usize;
+<a href=#201 id=201 data-nosnippet>201</a>    <span class="kw">let </span>dx = (x <span class="kw">as </span>i32 - center <span class="kw">as </span>i32).unsigned_abs();
+<a href=#202 id=202 data-nosnippet>202</a>    <span class="kw">let </span>dy = (y <span class="kw">as </span>i32 - center <span class="kw">as </span>i32).unsigned_abs();
 <a href=#203 id=203 data-nosnippet>203</a>
 <a href=#204 id=204 data-nosnippet>204</a>    <span class="comment">// Skip finder pattern area
 <a href=#205 id=205 data-nosnippet>205</a>    </span><span class="kw">if </span>dx &lt;= <span class="number">5 </span>&amp;&amp; dy &lt;= <span class="number">5 </span>{
@@ -290,22 +290,22 @@
 <a href=#290 id=290 data-nosnippet>290</a>
 <a href=#291 id=291 data-nosnippet>291</a>        <span class="comment">// Verify they are within valid ranges
 <a href=#292 id=292 data-nosnippet>292</a>        </span><span class="macro">assert!</span>(
-<a href=#293 id=293 data-nosnippet>293</a>            result1 &gt;= <span class="number">1 </span>&amp;&amp; result1 &lt;= <span class="number">4</span>,
+<a href=#293 id=293 data-nosnippet>293</a>            (<span class="number">1</span>..=<span class="number">4</span>).contains(<span class="kw-2">&amp;</span>result1),
 <a href=#294 id=294 data-nosnippet>294</a>            <span class="string">"Compact layers should be 1-4, got {}"</span>,
 <a href=#295 id=295 data-nosnippet>295</a>            result1
 <a href=#296 id=296 data-nosnippet>296</a>        );
 <a href=#297 id=297 data-nosnippet>297</a>        <span class="macro">assert!</span>(
-<a href=#298 id=298 data-nosnippet>298</a>            result2 &gt;= <span class="number">1 </span>&amp;&amp; result2 &lt;= <span class="number">4</span>,
+<a href=#298 id=298 data-nosnippet>298</a>            (<span class="number">1</span>..=<span class="number">4</span>).contains(<span class="kw-2">&amp;</span>result2),
 <a href=#299 id=299 data-nosnippet>299</a>            <span class="string">"Compact layers should be 1-4, got {}"</span>,
 <a href=#300 id=300 data-nosnippet>300</a>            result2
 <a href=#301 id=301 data-nosnippet>301</a>        );
 <a href=#302 id=302 data-nosnippet>302</a>        <span class="macro">assert!</span>(
-<a href=#303 id=303 data-nosnippet>303</a>            result3 &gt;= <span class="number">1 </span>&amp;&amp; result3 &lt;= <span class="number">32</span>,
+<a href=#303 id=303 data-nosnippet>303</a>            (<span class="number">1</span>..=<span class="number">32</span>).contains(<span class="kw-2">&amp;</span>result3),
 <a href=#304 id=304 data-nosnippet>304</a>            <span class="string">"Full layers should be 1-32, got {}"</span>,
 <a href=#305 id=305 data-nosnippet>305</a>            result3
 <a href=#306 id=306 data-nosnippet>306</a>        );
 <a href=#307 id=307 data-nosnippet>307</a>        <span class="macro">assert!</span>(
-<a href=#308 id=308 data-nosnippet>308</a>            result4 &gt;= <span class="number">1 </span>&amp;&amp; result4 &lt;= <span class="number">32</span>,
+<a href=#308 id=308 data-nosnippet>308</a>            (<span class="number">1</span>..=<span class="number">32</span>).contains(<span class="kw-2">&amp;</span>result4),
 <a href=#309 id=309 data-nosnippet>309</a>            <span class="string">"Full layers should be 1-32, got {}"</span>,
 <a href=#310 id=310 data-nosnippet>310</a>            result4
 <a href=#311 id=311 data-nosnippet>311</a>        );
@@ -319,9 +319,9 @@
 <a href=#319 id=319 data-nosnippet>319</a>        <span class="comment">// Check that center has some pattern
 <a href=#320 id=320 data-nosnippet>320</a>        </span><span class="kw">let </span>center = <span class="number">10</span>;
 <a href=#321 id=321 data-nosnippet>321</a>        <span class="kw">let </span><span class="kw-2">mut </span>has_pattern = <span class="bool-val">false</span>;
-<a href=#322 id=322 data-nosnippet>322</a>        <span class="kw">for </span>y <span class="kw">in </span>(center - <span class="number">5</span>)..=(center + <span class="number">5</span>) {
-<a href=#323 id=323 data-nosnippet>323</a>            <span class="kw">for </span>x <span class="kw">in </span>(center - <span class="number">5</span>)..=(center + <span class="number">5</span>) {
-<a href=#324 id=324 data-nosnippet>324</a>                <span class="kw">if </span>matrix[y][x] {
+<a href=#322 id=322 data-nosnippet>322</a>        <span class="kw">for </span>row <span class="kw">in </span>matrix.iter().take(center + <span class="number">5 </span>+ <span class="number">1</span>).skip(center - <span class="number">5</span>) {
+<a href=#323 id=323 data-nosnippet>323</a>            <span class="kw">for </span>cell <span class="kw">in </span>row.iter().take(center + <span class="number">5 </span>+ <span class="number">1</span>).skip(center - <span class="number">5</span>) {
+<a href=#324 id=324 data-nosnippet>324</a>                <span class="kw">if </span><span class="kw-2">*</span>cell {
 <a href=#325 id=325 data-nosnippet>325</a>                    has_pattern = <span class="bool-val">true</span>;
 <a href=#326 id=326 data-nosnippet>326</a>                    <span class="kw">break</span>;
 <a href=#327 id=327 data-nosnippet>327</a>                }
