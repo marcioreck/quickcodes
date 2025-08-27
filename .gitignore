@@ -3,3 +3,21 @@ cpp/build/
 node_modules/
 nodejs/target/
 nodejs/node_modules/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+dist/
+build/
+*.egg-info/
