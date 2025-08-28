@@ -907,8 +907,8 @@ fn calculate_edge_density(image: &GrayImage) -> f32 {
                 image.get_pixel_checked(x+1, y),
                 image.get_pixel_checked(x, y+1)
             ) {
-                let gx = (right[0] as i16) - (center[0] as i16);
-                let gy = (down[0] as i16) - (center[0] as i16);
+                let gx = (right[0] as i32) - (center[0] as i32);
+                let gy = (down[0] as i32) - (center[0] as i32);
                 let gradient = ((gx * gx + gy * gy) as f32).sqrt();
                 
                 if gradient > 30.0 { // Threshold para considerar uma borda

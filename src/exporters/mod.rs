@@ -1,6 +1,6 @@
 //! Export modules for different formats
 
-#[cfg(feature = "pdf")]
+#[cfg(all(feature = "pdf", not(target_arch = "wasm32")))]
 pub mod pdf;
 #[cfg(feature = "png")]
 pub mod png;
@@ -8,7 +8,7 @@ pub mod png;
 pub mod svg;
 
 // Re-export exporter functions
-#[cfg(feature = "pdf")]
+#[cfg(all(feature = "pdf", not(target_arch = "wasm32")))]
 pub use pdf::export_pdf;
 #[cfg(feature = "png")]
 pub use png::export_png;

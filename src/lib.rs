@@ -6,6 +6,9 @@ pub mod generators;
 pub mod readers;
 pub mod types;
 
+// Advanced detection system (Phase 5)
+pub mod detection;
+
 #[cfg(feature = "python")]
 pub mod python;
 
@@ -88,11 +91,11 @@ pub fn generate(
         ExportFormat::PNG => Err(anyhow::anyhow!(
             "PNG export not available - enable the 'png' feature"
         )),
-        #[cfg(feature = "pdf")]
+        #[cfg(all(feature = "pdf", not(target_arch = "wasm32")))]
         ExportFormat::PDF => Ok(exporters::pdf::export_pdf(&barcode)?),
-        #[cfg(not(feature = "pdf"))]
+        #[cfg(any(not(feature = "pdf"), target_arch = "wasm32"))]
         ExportFormat::PDF => Err(anyhow::anyhow!(
-            "PDF export not available - enable the 'pdf' feature"
+            "PDF export not available - enable the 'pdf' feature or not supported on WASM"
         )),
     }
 }

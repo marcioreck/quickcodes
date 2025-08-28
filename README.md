@@ -10,7 +10,6 @@
 [![Documentation](https://docs.rs/quickcodes/badge.svg)](https://docs.rs/quickcodes)
 [![codecov](https://codecov.io/gh/marcioreck/quickcodes/branch/main/graph/badge.svg)](https://codecov.io/gh/marcioreck/quickcodes)
 [![Stars](https://img.shields.io/github/stars/marcioreck/quickcodes?style=social)](https://github.com/marcioreck/quickcodes)
-[![Stars](https://img.shields.io/github/stars/marcioreck/quickcodes?style=social)](https://github.com/marcioreck/quickcodes)
 
 > 🎉 **QuickCodes está agora disponível no [crates.io](https://crates.io/crates/quickcodes)!**
 
@@ -293,7 +292,6 @@ make                               # Compila os testes
   * [x] Configurações de tamanho e DPI
 * [x] **Bindings Iniciais**
   * [x] Python (PyO3) - Implementado e testado
-  * [ ] JavaScript/Node.js (NAPI-RS) [postergado para Fase 4 - WebAssembly tem prioridade]
 
 ### 🔧 **Fase 2 - Expansão Industrial** ✅ CONCLUÍDA
 * [x] **Códigos 2D Avançados** ✅ CONCLUÍDO
@@ -344,11 +342,107 @@ make                               # Compila os testes
   * [x] Suporte para múltiplos formatos de exportação (SVG, PNG)
   * [x] API unificada para browser e Node.js
   * [x] Documentação completa com exemplos práticos
-  * [ ] Build WASM otimizado
-  * [ ] API JavaScript para browser
-  * [ ] JavaScript/Node.js bindings (NAPI-RS ou WASM)
-  * [ ] Leitura de webcam em tempo real
+  * [x] Leitura de webcam em tempo real
+  
+### **Fase 5 - Biblioteca Especializada de Detecção** [🚀 EM ANDAMENTO]
+
+#### 🔍 **Nova Engine de Detecção com 90%+ Precisão**
+Inspirada nas técnicas do ZXing e bardecode, nova implementação ground-up para eliminar falsos positivos:
+
+* [x] **Architecture Foundation (2-3 semanas)** ✅ **CONCLUÍDO**
+  * [x] Módulo de pré-processamento avançado (`src/detection/preprocessing/`)
+    - [x] Binarização adaptiva multi-método (Otsu, local, gradient-based)
+    - [x] Filtros de ruído com morfologia matemática
+    - [x] Análise de contexto da imagem (contraste, densidade de bordas, distribuição de brilho)
+    - [x] Pipeline de correção de perspectiva avançado
+  * [x] Sistema de confiança robusto (`src/detection/confidence/`)
+    - [x] Scoring geométrico (proporções, ângulos, simetria)
+    - [x] Scoring de padrão (integridade, consistência)
+    - [x] Scoring de contraste e qualidade
+    - [x] Threshold adaptativo baseado em contexto (min 85% para 90% accuracy)
+  * [x] Framework de validação multi-estágio (`src/detection/validation/`)
+    - [x] Non-maximum suppression para múltiplas detecções
+    - [x] Pipeline de validação em 5 estágios
+    - [x] Contextual analysis integrado
+
+* [🔄] **Detecção 2D Especializada (3-4 semanas)** [EM ANDAMENTO]
+  * [✅] **QR Code Engine** (`src/detection/engines/qr.rs`) **AVANÇADO COMPLETO**
+    - [x] Finder pattern detection com validação 1:1:3:1:1 rigorosa
+    - [x] Triangulação geométrica entre 3 finder patterns
+    - [x] Validação de ângulos (90° ± tolerância) e proporções
+    - [x] Alignment pattern detection para versões > 1
+    - [x] Timing pattern extraction (horizontal/vertical)
+    - [x] Perspective correction com sampling preciso
+  * [✅] **DataMatrix Engine** (`src/detection/engines/datamatrix.rs`) **COMPLETO**
+    - [x] L-border detection com Hough transform ✅ **IMPLEMENTADO**
+    - [x] Timing pattern validation alternado ✅ **IMPLEMENTADO**
+    - [x] Corner detection de alta precisão ✅ **IMPLEMENTADO**
+    - [x] Solid border validation ✅ **IMPLEMENTADO**
+  * [ ] **PDF417 Engine** (`src/detection/engines/pdf417.rs`)
+    - [ ] Start/stop pattern recognition (guard patterns)
+    - [ ] Row pattern tracking com drift tolerance
+    - [ ] Pattern consistency validation
+  * [ ] **Aztec Engine** (`src/detection/engines/aztec.rs`)
+    - [ ] Bullseye pattern detection
+    - [ ] Reference grid validation
+    - [ ] Concentric square detection
+
+* [ ] **Detecção 1D Especializada (2-3 semanas)** [PRÓXIMO]
+  * [ ] **Universal 1D Scanner** (`src/detection/engines/linear.rs`)
+    - [ ] Multi-angle scanning (0°, 45°, 90°, 135°)
+    - [ ] Bar/space ratio analysis
+    - [ ] Pattern matching para cada formato (EAN-13, Code128, Code39, ITF-14, Codabar, UPC-A)
+    - [ ] Checksum validation integrado
+    - [ ] Edge detection e smoothing
+  * [ ] **Format-Specific Validators**
+    - [ ] EAN-13: Pattern validation + checksum + length
+    - [ ] Code128: Start/stop codes + character set validation
+    - [ ] Code39: Start/stop asterisks + character set
+    - [ ] ITF-14: Paired bars validation + checksum
+    - [ ] Codabar: Start/stop characters + format validation
+    - [ ] UPC-A: Pattern validation + checksum
+
+* [x] **Anti-False Positive System (2-3 semanas)** ✅ **FOUNDATION COMPLETA**
+  * [x] **Multi-Stage Pipeline** (`src/detection/validation/`)
+    - [x] Stage 1: Pattern pre-filter (rápido, baixa precisão)
+    - [x] Stage 2: Geometric validation (proporções, ângulos, tamanhos)
+    - [x] Stage 3: Content validation (tentativa de decodificação)
+    - [x] Stage 4: Final validation (checksum, formato, contexto)
+  * [x] **Contextual Analysis**
+    - [x] Image quality assessment
+    - [x] Noise level detection
+    - [x] Adaptive threshold adjustment
+    - [x] ROI (Region of Interest) prioritization
+  * [x] **Confidence Scoring**
+    - [x] Combined geometric + pattern + content score
+    - [x] Threshold calibration para 90%+ accuracy
+    - [x] Non-maximum suppression para múltiplas detecções
+
+* [ ] **Integration & Performance (1-2 semanas)**
+  * [ ] WASM bindings otimizados
+  * [ ] Parallel processing com rayon
+  * [ ] Memory optimization
+  * [ ] Benchmarking extensivo
+  * [ ] **Métricas Target:**
+    - [ ] True Positive Rate: > 90%
+    - [ ] False Positive Rate: < 1%
+    - [ ] Processing Time: < 100ms (1080p)
+    - [ ] Memory Usage: < 50MB peak
+
+### 🌐 **Fase 6 - Ecosystem Expansion** [FUTURO]
 * [ ] **CLI Tool**
+  * [ ] `quickcodes generate` - Geração via linha de comando
+  * [ ] `quickcodes read` - Leitura via linha de comando
+  * [ ] Suporte a batch processing
+* [ ] **API REST**
+  * [ ] Microserviço em Docker
+  * [ ] Endpoints para geração e leitura
+  * [ ] Documentação OpenAPI/Swagger
+* [ ] **Performance e Otimização**
+  * [ ] Otimizações SIMD
+  * [ ] Multi-threading
+  * [ ] Benchmarks automatizados
+  * [ ] Testes de performance
   * [ ] `quickcodes generate` - Geração via linha de comando
   * [ ] `quickcodes read` - Leitura via linha de comando
   * [ ] Suporte a batch processing
@@ -366,7 +460,39 @@ make                               # Compila os testes
   * [ ] Expansão de formatos suportados
   * [ ] Otimização do pipeline de detecção
 
-### 🌐 **Fase 5 - Ecosystem Expansion** [FUTURO]
+#### 📊 **Test Dataset e Validation**
+* [ ] **Comprehensive Test Suite**
+  * [ ] Imagens com ruído (diferentes níveis)
+  * [ ] Múltiplas rotações e distorções
+  * [ ] Códigos parcialmente obstruídos
+  * [ ] Diferentes condições de iluminação
+  * [ ] Múltiplos códigos por imagem
+  * [ ] Benchmarks contra ZXing e outras bibliotecas
+
+#### 🎯 **API Goals**
+```rust
+// Nova API com confidence scoring
+pub struct AdvancedDetectionResult {
+    pub data: String,
+    pub barcode_type: BarcodeType,
+    pub confidence: f32,        // 0.0 - 1.0
+    pub geometric_score: f32,   // Proporções, ângulos
+    pub pattern_score: f32,     // Integridade do padrão
+    pub content_score: f32,     // Validação de conteúdo
+    pub position: BoundingBox,  // Localização na imagem
+}
+
+// Configuração avançada
+pub struct DetectionConfig {
+    pub min_confidence: f32,          // Default: 0.85 para 90% accuracy
+    pub enable_rotation_correction: bool,
+    pub enable_perspective_correction: bool,
+    pub max_codes_per_image: usize,
+    pub target_formats: Vec<BarcodeType>,
+}
+```
+
+**Total Timeline: 8-12 semanas para biblioteca especializada completa**
 * [ ] **Recursos Avançados**
   * [ ] Sistema de plugins
   * [ ] Configurações avançadas de renderização
