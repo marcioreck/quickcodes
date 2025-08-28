@@ -13,9 +13,10 @@ impl ConfidenceScorer {
         let geometric = Self::calculate_geometric_score(candidate);
         let pattern = Self::calculate_pattern_score(candidate);
         let content = Self::calculate_content_score(candidate);
+        let format_specificity = Self::calculate_format_specificity(candidate);
         
-        // Weighted combination - geometric and pattern are most important for detection
-        let overall = 0.4 * geometric + 0.4 * pattern + 0.2 * content;
+        // Weighted combination - emphasize format specificity and pattern integrity
+        let overall = 0.3 * geometric + 0.4 * pattern + 0.1 * content + 0.2 * format_specificity;
         
         ConfidenceScore {
             overall,
@@ -85,6 +86,35 @@ impl ConfidenceScorer {
                 }
             },
             None => 0.0, // No content extracted
+        }
+    }
+    
+    /// Calculate format-specific confidence to reduce cross-format false positives
+    fn calculate_format_specificity(candidate: &DetectionCandidate) -> f32 {
+        match (&candidate.barcode_type, &candidate.pattern_data) {
+            // QR Code should have QR patterns
+            (BarcodeType::QRCode, PatternData::QRCode { finder_patterns, .. }) => {
+                if finder_patterns.len() == 3 { 1.0 } else { 0.0 }
+            },
+            // DataMatrix should have DataMatrix patterns
+            (BarcodeType::DataMatrix, PatternData::DataMatrix { .. }) => 1.0,
+            // PDF417 should have PDF417 patterns
+            (BarcodeType::PDF417, PatternData::PDF417 { .. }) => 1.0,
+            // Aztec should have Aztec patterns
+            (BarcodeType::Aztec, PatternData::Aztec { .. }) => 1.0,
+            // Linear formats should have linear patterns
+            (BarcodeType::EAN13, PatternData::Linear { .. }) |
+            (BarcodeType::UPCA, PatternData::Linear { .. }) |
+            (BarcodeType::Code128, PatternData::Linear { .. }) |
+            (BarcodeType::Code39, PatternData::Linear { .. }) |
+            (BarcodeType::ITF14, PatternData::Linear { .. }) |
+            (BarcodeType::Codabar, PatternData::Linear { .. }) => {
+                // For linear codes, we need additional validation
+                // For now, give partial score to allow detection but prioritize pattern matching
+                0.7
+            },
+            // Mismatch between expected format and pattern type
+            _ => 0.1, // Heavy penalty for format/pattern mismatch
         }
     }
     

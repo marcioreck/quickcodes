@@ -4,7 +4,7 @@ use std::str::FromStr;
 use thiserror::Error;
 
 /// Supported barcode types
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum BarcodeType {
     // 1D Barcodes
     EAN13,

@@ -4,73 +4,77 @@ use quickcodes::types::BarcodeType;
 use image::open;
 use std::path::Path;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("🧪 Real Barcode Detection Test");
+fn main() {
+    println!("🔍 Testing QuickCodes Detection System");
+    println!("======================================");
     
-    // Check if we have any barcode images in the examples output
-    let test_images = [
+    let test_images = vec![
         "examples/output/demo_qr.png",
         "examples/output/demo_datamatrix.png", 
         "examples/output/ean13_example.png",
-        "barcode.png"
+        "examples/output/barcode.png"
     ];
     
-    // Configure detection for high accuracy
+    // Configuration for general detection
     let config = DetectionConfig {
-        min_confidence: 0.7, // Lower threshold for testing
-        enable_rotation_correction: true,
-        enable_perspective_correction: true,
         target_formats: vec![
             BarcodeType::QRCode,
             BarcodeType::DataMatrix,
             BarcodeType::EAN13,
+            BarcodeType::UPCA,
             BarcodeType::Code128,
+            BarcodeType::Code39,
+            BarcodeType::ITF14,
+            BarcodeType::Codabar,
+            BarcodeType::PDF417,
+            BarcodeType::Aztec,
         ],
+        min_confidence: 0.7,
+        max_codes_per_image: 5,
+        enable_rotation_correction: true,
+        enable_perspective_correction: true,
         enable_multi_scale: true,
         enable_contextual_analysis: true,
-        max_codes_per_image: 10,
     };
-    
+
     let detector = AdvancedDetector::new(config);
-    
-    for image_path in &test_images {
-        if Path::new(image_path).exists() {
-            println!("\n📷 Testing image: {}", image_path);
-            
-            match open(image_path) {
-                Ok(img) => {
-                    // Convert to grayscale ImageBuffer as expected by detector
-                    let gray_img = img.to_luma8();
-                    let results = detector.detect_all(&gray_img);
-                    println!("   📊 Found {} potential codes", results.len());
-                    
+
+    for image_path in test_images {
+        println!("\n📷 Testing: {}", image_path);
+        
+        if !Path::new(image_path).exists() {
+            println!("   ⚠️  File not found, skipping...");
+            continue;
+        }
+
+        match open(image_path) {
+            Ok(img) => {
+                let gray_img = img.to_luma8();
+                println!("   📊 Image: {}x{}", gray_img.width(), gray_img.height());
+                
+                let results = detector.detect_all(&gray_img);
+                
+                if results.is_empty() {
+                    println!("   ❌ No codes detected");
+                } else {
+                    println!("   ✅ Found {} code(s):", results.len());
                     for (i, result) in results.iter().enumerate() {
-                        println!("   🔍 Code {}: {:?} (confidence: {:.2})", 
-                               i + 1, result.barcode_type, result.confidence);
-                        println!("      📍 Location: ({}, {}) to ({}, {})",
-                               result.position.x, result.position.y,
-                               result.position.x + result.position.width,
-                               result.position.y + result.position.height);
-                    }
-                    
-                    if results.is_empty() {
-                        println!("   ℹ️  No codes detected - this is expected as detection engines need full implementation");
+                        println!("      {}. {:?} (confidence: {:.2})", 
+                                 i + 1, result.barcode_type, result.confidence);
+                        println!("         Data: \"{}\"", result.data);
+                        println!("         Position: ({}, {}) {}x{}", 
+                                 result.position.x, result.position.y,
+                                 result.position.width, result.position.height);
+                        println!("         Scores: geometric={:.2}, pattern={:.2}, content={:.2}",
+                                 result.geometric_score, result.pattern_score, result.content_score);
                     }
                 }
-                Err(e) => {
-                    println!("   ❌ Could not load image: {}", e);
-                }
+            },
+            Err(e) => {
+                println!("   ❌ Error loading image: {}", e);
             }
         }
     }
     
-    println!("\n✅ Real detection test completed!");
-    println!("📋 Next steps:");
-    println!("   1. Implement full QR finder pattern scanning");
-    println!("   2. Add DataMatrix L-border detection");
-    println!("   3. Implement linear barcode scanning");
-    println!("   4. Add format-specific validation");
-    println!("   5. Optimize performance and accuracy");
-    
-    Ok(())
+    println!("\n🏁 Detection test completed!");
 }

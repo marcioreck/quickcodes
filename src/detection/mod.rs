@@ -5,6 +5,7 @@ pub mod preprocessing;
 pub mod confidence;
 pub mod validation;
 pub mod engines;
+pub mod decoder;
 
 use crate::types::BarcodeType;
 use image::{ImageBuffer, Luma};

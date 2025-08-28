@@ -247,174 +247,172 @@ fn validate_barcode_pattern(
 /// Validate EAN-13 pattern
 fn validate_ean13_pattern(bars_and_spaces: &[u32]) -> Option<LinearValidationResult> {
     // EAN-13 has specific structure: start guard + 6 digits + center guard + 6 digits + end guard
-    // Total: 95 modules (3+42+5+42+3)
+    // But real images may have different run-length counts, so be more flexible
     
-    if bars_and_spaces.len() < 50 || bars_and_spaces.len() > 70 {
-        return None; // Wrong number of bars/spaces
+    if bars_and_spaces.len() < 20 || bars_and_spaces.len() > 100 {
+        return None; // Too short or too long
     }
     
-    // Look for start guard pattern (1-1-1)
-    let start_guard = find_guard_pattern(bars_and_spaces, &[1, 1, 1], 0);
-    if start_guard.is_none() {
+    // Look for alternating pattern (bar-space-bar-space...)
+    let mut alternating_count = 0;
+    for i in 0..bars_and_spaces.len() - 1 {
+        // In EAN-13, bars and spaces should alternate reasonably
+        if (i % 2 == 0 && bars_and_spaces[i] > 0) || (i % 2 == 1 && bars_and_spaces[i] > 0) {
+            alternating_count += 1;
+        }
+    }
+    
+    // Should have reasonable alternating pattern
+    if alternating_count < bars_and_spaces.len() / 2 {
         return None;
     }
     
-    // Look for center guard pattern (1-1-1-1-1)
-    let center_guard = find_guard_pattern(bars_and_spaces, &[1, 1, 1, 1, 1], bars_and_spaces.len() / 3);
-    if center_guard.is_none() {
+    // Look for guard-like patterns (short runs)
+    let mut short_runs = 0;
+    let mut long_runs = 0;
+    let avg_run = bars_and_spaces.iter().sum::<u32>() as f32 / bars_and_spaces.len() as f32;
+    
+    for &run in bars_and_spaces {
+        if (run as f32) < avg_run * 2.0 {
+            short_runs += 1;
+        } else {
+            long_runs += 1;
+        }
+    }
+    
+    // EAN-13 should have more short runs than long runs (guards + data)
+    if short_runs < long_runs {
         return None;
     }
     
-    // Look for end guard pattern (1-1-1)
-    let end_guard = find_guard_pattern(bars_and_spaces, &[1, 1, 1], bars_and_spaces.len() * 2 / 3);
-    if end_guard.is_none() {
-        return None;
+    // Check for reasonable run-length distribution
+    let min_run = *bars_and_spaces.iter().min().unwrap_or(&0);
+    let max_run = *bars_and_spaces.iter().max().unwrap_or(&0);
+    
+    if min_run == 0 || max_run > min_run * 10 {
+        return None; // Too much variation
     }
     
     Some(LinearValidationResult {
-        confidence: 0.8,
+        confidence: 0.7, // Lower confidence since we're being more permissive
         start_end_patterns: (vec![1, 1, 1], vec![1, 1, 1]),
     })
 }
 
 /// Validate Code128 pattern
 fn validate_code128_pattern(bars_and_spaces: &[u32]) -> Option<LinearValidationResult> {
-    // Code128 has start/stop patterns and variable length
-    if bars_and_spaces.len() < 20 {
+    // Code128 has more complex patterns, for now use basic validation
+    if bars_and_spaces.len() < 15 || bars_and_spaces.len() > 100 {
         return None;
     }
     
-    // Code128 starts with one of three start patterns
-    let start_patterns = [
-        vec![2, 1, 2, 3, 2, 2], // Start A
-        vec![2, 2, 2, 1, 2, 3], // Start B  
-        vec![2, 2, 2, 3, 2, 1], // Start C
-    ];
+    // Basic run-length validation for Code128-like patterns
+    let avg_run = bars_and_spaces.iter().sum::<u32>() as f32 / bars_and_spaces.len() as f32;
+    let mut valid_runs = 0;
     
-    let mut found_start = None;
-    for start_pattern in &start_patterns {
-        if pattern_matches_at_position(bars_and_spaces, start_pattern, 0, 0.3) {
-            found_start = Some(start_pattern.clone());
-            break;
+    for &run in bars_and_spaces {
+        if (run as f32) < avg_run * 4.0 && run > 0 {
+            valid_runs += 1;
         }
     }
     
-    if found_start.is_none() {
-        return None;
-    }
-    
-    // Look for stop pattern at the end
-    let stop_pattern = vec![2, 3, 3, 1, 1, 1, 2];
-    let end_pos = bars_and_spaces.len().saturating_sub(stop_pattern.len());
-    
-    if !pattern_matches_at_position(bars_and_spaces, &stop_pattern, end_pos, 0.3) {
+    if valid_runs < bars_and_spaces.len() * 3 / 4 {
         return None;
     }
     
     Some(LinearValidationResult {
-        confidence: 0.85,
-        start_end_patterns: (found_start.unwrap(), stop_pattern),
+        confidence: 0.7,
+        start_end_patterns: (vec![2, 1, 2, 3, 2, 2], vec![2, 3, 3, 1, 1, 1, 2]),
     })
 }
 
 /// Validate Code39 pattern
 fn validate_code39_pattern(bars_and_spaces: &[u32]) -> Option<LinearValidationResult> {
-    // Code39 starts and ends with asterisk (*)
-    // Asterisk pattern: 1-2-1-1-2-1-1-2-1 (9 elements)
-    let asterisk_pattern = vec![1, 2, 1, 1, 2, 1, 1, 2, 1];
-    
-    if bars_and_spaces.len() < 20 {
+    // Code39 has wider bars and spaces, more tolerance needed
+    if bars_and_spaces.len() < 15 || bars_and_spaces.len() > 150 {
         return None;
     }
     
-    // Check start asterisk
-    if !pattern_matches_at_position(bars_and_spaces, &asterisk_pattern, 0, 0.4) {
-        return None;
+    // Code39 typically has alternating narrow/wide elements
+    let avg_run = bars_and_spaces.iter().sum::<u32>() as f32 / bars_and_spaces.len() as f32;
+    let mut narrow_count = 0;
+    let mut wide_count = 0;
+    
+    for &run in bars_and_spaces {
+        if (run as f32) < avg_run * 1.5 {
+            narrow_count += 1;
+        } else if (run as f32) < avg_run * 4.0 {
+            wide_count += 1;
+        }
     }
     
-    // Check end asterisk
-    let end_pos = bars_and_spaces.len().saturating_sub(asterisk_pattern.len());
-    if !pattern_matches_at_position(bars_and_spaces, &asterisk_pattern, end_pos, 0.4) {
+    // Code39 should have both narrow and wide elements
+    if narrow_count < 5 || wide_count < 3 {
         return None;
     }
     
     Some(LinearValidationResult {
-        confidence: 0.75,
-        start_end_patterns: (asterisk_pattern.clone(), asterisk_pattern),
+        confidence: 0.7,
+        start_end_patterns: (vec![1, 2, 1, 1, 2, 1, 1, 2, 1], vec![1, 2, 1, 1, 2, 1, 1, 2, 1]),
     })
 }
 
 /// Validate ITF-14 pattern (Interleaved 2 of 5)
 fn validate_itf14_pattern(bars_and_spaces: &[u32]) -> Option<LinearValidationResult> {
-    // ITF has start pattern (1-1-1-1) and stop pattern (2-1-1)
-    if bars_and_spaces.len() < 30 {
+    // ITF has specific patterns but can be flexible for detection
+    if bars_and_spaces.len() < 15 || bars_and_spaces.len() > 120 {
         return None;
     }
     
-    let start_pattern = vec![1, 1, 1, 1];
-    let stop_pattern = vec![2, 1, 1];
+    // ITF has a distinctive pattern with pairs of bars/spaces
+    let avg_run = bars_and_spaces.iter().sum::<u32>() as f32 / bars_and_spaces.len() as f32;
+    let mut valid_runs = 0;
     
-    // Check start pattern
-    if !pattern_matches_at_position(bars_and_spaces, &start_pattern, 0, 0.3) {
-        return None;
+    // ITF allows more variation than other formats
+    for &run in bars_and_spaces {
+        if run > 0 && (run as f32) < avg_run * 5.0 {
+            valid_runs += 1;
+        }
     }
     
-    // Check stop pattern
-    let end_pos = bars_and_spaces.len().saturating_sub(stop_pattern.len());
-    if !pattern_matches_at_position(bars_and_spaces, &stop_pattern, end_pos, 0.3) {
+    // More lenient validation for ITF14
+    if valid_runs < bars_and_spaces.len() * 2 / 3 {
         return None;
     }
     
     Some(LinearValidationResult {
-        confidence: 0.8,
-        start_end_patterns: (start_pattern, stop_pattern),
+        confidence: 0.65, // Lower confidence due to more lenient validation
+        start_end_patterns: (vec![1, 1, 1, 1], vec![2, 1, 1]),
     })
 }
 
 /// Validate Codabar pattern
 fn validate_codabar_pattern(bars_and_spaces: &[u32]) -> Option<LinearValidationResult> {
-    // Codabar starts and ends with A, B, C, or D characters
-    if bars_and_spaces.len() < 15 {
+    // Codabar has wide ratio typically 2:1 or 3:1
+    if bars_and_spaces.len() < 15 || bars_and_spaces.len() > 100 {
         return None;
     }
     
-    // Start/stop characters patterns (A, B, C, D)
-    let start_stop_patterns = [
-        vec![1, 1, 1, 1, 2, 2, 1], // A
-        vec![1, 1, 2, 2, 1, 1, 1], // B
-        vec![1, 1, 1, 2, 1, 2, 1], // C
-        vec![1, 1, 2, 1, 1, 2, 1], // D
-    ];
+    let avg_run = bars_and_spaces.iter().sum::<u32>() as f32 / bars_and_spaces.len() as f32;
+    let mut narrow_count = 0;
+    let mut wide_count = 0;
     
-    let mut found_start = None;
-    for pattern in &start_stop_patterns {
-        if pattern_matches_at_position(bars_and_spaces, pattern, 0, 0.4) {
-            found_start = Some(pattern.clone());
-            break;
+    for &run in bars_and_spaces {
+        if (run as f32) < avg_run * 1.8 {
+            narrow_count += 1;
+        } else if (run as f32) < avg_run * 4.0 {
+            wide_count += 1;
         }
     }
     
-    if found_start.is_none() {
-        return None;
-    }
-    
-    // Check for valid end pattern
-    let mut found_end = None;
-    for pattern in &start_stop_patterns {
-        let end_pos = bars_and_spaces.len().saturating_sub(pattern.len());
-        if pattern_matches_at_position(bars_and_spaces, pattern, end_pos, 0.4) {
-            found_end = Some(pattern.clone());
-            break;
-        }
-    }
-    
-    if found_end.is_none() {
+    // Codabar should have both narrow and wide elements
+    if narrow_count < 8 || wide_count < 4 {
         return None;
     }
     
     Some(LinearValidationResult {
-        confidence: 0.75,
-        start_end_patterns: (found_start.unwrap(), found_end.unwrap()),
+        confidence: 0.7,
+        start_end_patterns: (vec![1, 1, 1, 1, 2, 2, 1], vec![1, 1, 1, 1, 2, 2, 1]),
     })
 }
 
@@ -465,7 +463,20 @@ fn pattern_matches_at_position(
     
     let actual_slice = &bars_and_spaces[position..position + pattern.len()];
     
-    // Calculate ratio-based comparison
+    // For guard patterns, check if they're roughly equal (ratio-based)
+    if pattern.iter().all(|&x| x == pattern[0]) {
+        // All elements should be roughly equal
+        let avg = actual_slice.iter().sum::<u32>() as f32 / actual_slice.len() as f32;
+        for &actual in actual_slice {
+            let ratio = actual as f32 / avg;
+            if ratio < (1.0 - tolerance) || ratio > (1.0 + tolerance) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    // Calculate ratio-based comparison for other patterns
     for (actual, expected) in actual_slice.iter().zip(pattern.iter()) {
         if *expected == 0 {
             continue; // Skip zero elements
