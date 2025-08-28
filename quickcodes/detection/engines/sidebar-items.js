@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["aztec","datamatrix","linear","pdf417","qr"]};

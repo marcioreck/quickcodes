@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["detect_aztec_candidates","detect_datamatrix_candidates","detect_linear_candidates","detect_pdf417_candidates"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["PreprocessingType"],"fn":["analyze_image_quality","apply_adaptive_threshold","apply_noise_filter","apply_otsu_threshold","enhance_contrast","enhance_edges","preprocess_image"],"struct":["BrightnessHistogram","ImageQualityMetrics","ProcessedImage"]};

@@ -907,8 +907,8 @@
 <a href=#907 id=907 data-nosnippet>907</a>                image.get_pixel_checked(x+<span class="number">1</span>, y),
 <a href=#908 id=908 data-nosnippet>908</a>                image.get_pixel_checked(x, y+<span class="number">1</span>)
 <a href=#909 id=909 data-nosnippet>909</a>            ) {
-<a href=#910 id=910 data-nosnippet>910</a>                <span class="kw">let </span>gx = (right[<span class="number">0</span>] <span class="kw">as </span>i16) - (center[<span class="number">0</span>] <span class="kw">as </span>i16);
-<a href=#911 id=911 data-nosnippet>911</a>                <span class="kw">let </span>gy = (down[<span class="number">0</span>] <span class="kw">as </span>i16) - (center[<span class="number">0</span>] <span class="kw">as </span>i16);
+<a href=#910 id=910 data-nosnippet>910</a>                <span class="kw">let </span>gx = (right[<span class="number">0</span>] <span class="kw">as </span>i32) - (center[<span class="number">0</span>] <span class="kw">as </span>i32);
+<a href=#911 id=911 data-nosnippet>911</a>                <span class="kw">let </span>gy = (down[<span class="number">0</span>] <span class="kw">as </span>i32) - (center[<span class="number">0</span>] <span class="kw">as </span>i32);
 <a href=#912 id=912 data-nosnippet>912</a>                <span class="kw">let </span>gradient = ((gx * gx + gy * gy) <span class="kw">as </span>f32).sqrt();
 <a href=#913 id=913 data-nosnippet>913</a>                
 <a href=#914 id=914 data-nosnippet>914</a>                <span class="kw">if </span>gradient &gt; <span class="number">30.0 </span>{ <span class="comment">// Threshold para considerar uma borda

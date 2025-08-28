@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["PatternData"],"mod":["confidence","engines","preprocessing","validation"],"struct":["AdvancedDetectionResult","AdvancedDetector","BoundingBox","DetectionCandidate","DetectionConfig","FinderPattern","LBorder"]};
