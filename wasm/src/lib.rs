@@ -216,14 +216,30 @@ pub fn read_from_image_data_internal(image_data: &ImageData) -> Result<JsValue, 
         }
     }
     
-    // Por enquanto, sempre retornar que não encontrou nada até implementarmos detecção real
-    console_log!("🔍 Barcode detection temporarily disabled to prevent false positives");
-    Ok(serde_wasm_bindgen::to_value(&WasmReadResult {
-        success: false,
-        barcode_type: None,
-        data: None,
-        error: Some("Barcode detection temporarily disabled to prevent false positives".to_string()),
-    })?)
+    // Tenta detectar códigos de barras usando o sistema de detecção real
+    console_log!("🔍 Starting barcode detection...");
+    
+    // Usar o sistema de detecção do quickcodes (PNG format)
+    match quickcodes::read_from_bytes(&png_data, Some("png")) {
+        Ok(result) => {
+            console_log!("✅ Barcode detected: {:?} - '{}'", result.barcode_type, result.data);
+            Ok(serde_wasm_bindgen::to_value(&WasmReadResult {
+                success: true,
+                barcode_type: Some(format!("{:?}", result.barcode_type)),
+                data: Some(result.data),
+                error: None,
+            })?)
+        },
+        Err(e) => {
+            console_log!("🔍 No barcode detected: {}", e);
+            Ok(serde_wasm_bindgen::to_value(&WasmReadResult {
+                success: false,
+                barcode_type: None,
+                data: None,
+                error: Some(format!("No barcode detected: {}", e)),
+            })?)
+        }
+    }
 }
 
 /// Read barcode from file (File object from browser)

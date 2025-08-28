@@ -214,7 +214,12 @@ pub fn read_all_from_file<P: AsRef<std::path::Path>>(
 pub fn read_from_bytes(_image_data: &[u8], _format: Option<&str>) -> AnyhowResult<ReadResult> {
     #[cfg(feature = "readers")]
     {
-        Ok(readers_read_from_bytes(_image_data, _format)?.remove(0))
+        let results = readers_read_from_bytes(_image_data, _format)?;
+        if results.is_empty() {
+            Err(anyhow::anyhow!("No barcode found in image"))
+        } else {
+            Ok(results.into_iter().next().unwrap())
+        }
     }
 
     #[cfg(not(feature = "readers"))]
