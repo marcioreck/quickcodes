@@ -24,7 +24,7 @@ anyhow = "1.0"
 # Image processing and generation
 image = { version = "0.24", optional = true }
 imageproc = { version = "0.23", optional = true }
-resvg = { version = "0.44", optional = true }
+resvg = { version = "0.45", optional = true }
 usvg = { version = "0.44", optional = true }
 tiny-skia = { version = "0.11", optional = true }
 
@@ -70,7 +70,7 @@ criterion = "0.5"
 tempfile = "3.8"
 chrono = "0.4"
 printpdf = { version = "0.7", features = ["embedded_images"] }
-resvg = "0.44"
+resvg = "0.45"
 usvg = "0.44"
 tiny-skia = "0.11"
 image = "0.24"
