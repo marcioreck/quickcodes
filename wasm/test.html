@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickCodes WASM - Teste Rápido</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2c3e50; text-align: center; }
+        button {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover { transform: translateY(-2px); }
+        .output {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px dashed #bdc3c7;
+        }
+        .success { border-color: #27ae60; background: #f8fff9; }
+        .error { border-color: #e74c3c; background: #fdf2f2; color: #c62828; }
+        .status { 
+            text-align: center;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 QuickCodes WebAssembly</h1>
+        <div class="status" id="status">🔄 Carregando módulo WASM...</div>
+        
+        <div>
+            <h3>🎯 Testes Rápidos</h3>
+            <button onclick="testQRCode()">📱 Gerar QR Code</button>
+            <button onclick="testEAN13()">🛒 Gerar EAN-13</button>
+            <button onclick="testDataMatrix()">💊 Gerar DataMatrix</button>
+            <button onclick="testAztec()">✈️ Gerar Aztec</button>
+            <button onclick="showInfo()">ℹ️ Info do Módulo</button>
+        </div>
+        
+        <div id="output" class="output">
+            <p>👆 Clique em um dos botões acima para testar a geração de códigos</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import init, { 
+            generate_svg, 
+            generate,
+            get_supported_types, 
+            get_supported_formats 
+        } from './pkg/web/quickcodes_wasm.js';
+
+        let wasmModule;
+
+        async function initWasm() {
+            try {
+                wasmModule = await init();
+                document.getElementById('status').innerHTML = '✅ Módulo WASM carregado com sucesso!';
+                document.getElementById('status').className = 'status success';
+                console.log('QuickCodes WASM loaded!');
+            } catch (error) {
+                console.error('Failed to load WASM:', error);
+                document.getElementById('status').innerHTML = '❌ Erro ao carregar WASM: ' + error.message;
+                document.getElementById('status').className = 'status error';
+            }
+        }
+
+        function showOutput(title, content, isError = false) {
+            const output = document.getElementById('output');
+            output.innerHTML = `<h4>${title}</h4>${content}`;
+            output.className = isError ? 'output error' : 'output success';
+        }
+
+        window.testQRCode = function() {
+            if (!wasmModule) {
+                showOutput('❌ Erro', 'Módulo WASM não carregado', true);
+                return;
+            }
+
+            try {
+                const result = generate_svg('QRCode', 'https://github.com/marcioreck/quickcodes');
+                if (result.success) {
+                    showOutput('📱 QR Code Gerado', result.data);
+                } else {
+                    showOutput('❌ Erro', result.error || 'Erro desconhecido', true);
+                }
+            } catch (error) {
+                showOutput('❌ Erro', error.message, true);
+            }
+        };
+
+        window.testEAN13 = function() {
+            if (!wasmModule) {
+                showOutput('❌ Erro', 'Módulo WASM não carregado', true);
+                return;
+            }
+
+            try {
+                const result = generate_svg('EAN13', '123456789012');
+                if (result.success) {
+                    showOutput('🛒 EAN-13 Gerado', result.data);
+                } else {
+                    showOutput('❌ Erro', result.error || 'Erro desconhecido', true);
+                }
+            } catch (error) {
+                showOutput('❌ Erro', error.message, true);
+            }
+        };
+
+        window.testDataMatrix = function() {
+            if (!wasmModule) {
+                showOutput('❌ Erro', 'Módulo WASM não carregado', true);
+                return;
+            }
+
+            try {
+                const result = generate_svg('DataMatrix', '010123456789012815240101');
+                if (result.success) {
+                    showOutput('💊 DataMatrix Gerado (ANVISA)', result.data);
+                } else {
+                    showOutput('❌ Erro', result.error || 'Erro desconhecido', true);
+                }
+            } catch (error) {
+                showOutput('❌ Erro', error.message, true);
+            }
+        };
+
+        window.testAztec = function() {
+            if (!wasmModule) {
+                showOutput('❌ Erro', 'Módulo WASM não carregado', true);
+                return;
+            }
+
+            try {
+                const result = generate_svg('Aztec', 'TKT:12345|FROM:NYC|TO:BOS|DATE:2025-08-21|SEAT:12A');
+                if (result.success) {
+                    showOutput('✈️ Aztec Gerado (Bilhete Aéreo)', result.data);
+                } else {
+                    showOutput('❌ Erro', result.error || 'Erro desconhecido', true);
+                }
+            } catch (error) {
+                showOutput('❌ Erro', error.message, true);
+            }
+        };
+
+        window.showInfo = function() {
+            if (!wasmModule) {
+                showOutput('❌ Erro', 'Módulo WASM não carregado', true);
+                return;
+            }
+
+            try {
+                const types = get_supported_types();
+                const formats = get_supported_formats();
+                
+                const info = `
+                    <p><strong>📊 Tipos Suportados:</strong><br>
+                    ${types.join(', ')}</p>
+                    
+                    <p><strong>📁 Formatos de Exportação:</strong><br>
+                    ${formats.join(', ')}</p>
+                    
+                    <p><strong>🔧 Tecnologia:</strong><br>
+                    WebAssembly (WASM) compilado do Rust</p>
+                    
+                    <p><strong>📈 Performance:</strong><br>
+                    Velocidade nativa no browser</p>
+                `;
+                
+                showOutput('ℹ️ Informações do Módulo', info);
+            } catch (error) {
+                showOutput('❌ Erro', error.message, true);
+            }
+        };
+
+        // Initialize when page loads
+        initWasm();
+    </script>
+</body>
+</html>

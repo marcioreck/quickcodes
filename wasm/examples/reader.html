@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickCodes WASM - Reader Demo</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .camera-container {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        video {
+            width: 100%;
+            max-width: 640px;
+            height: 480px;
+            background: #000;
+            border-radius: 8px;
+        }
+        
+        canvas {
+            display: none;
+        }
+        
+        .controls {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 0 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.3);
+        }
+        
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .results {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .results.success {
+            border-color: #27ae60;
+            background: #f8fff9;
+        }
+        
+        .results.error {
+            border-color: #e74c3c;
+            background: #fdf2f2;
+        }
+        
+        .result-item {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .result-type {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+        
+        .result-data {
+            font-family: 'Monaco', 'Consolas', monospace;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            word-break: break-all;
+        }
+        
+        .file-upload {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px dashed #bdc3c7;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-upload:hover {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+        
+        .file-upload.dragover {
+            border-color: #27ae60;
+            background: #f8fff9;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+        }
+        
+        .status.info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            color: #1976d2;
+        }
+        
+        .status.success {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            color: #2e7d32;
+        }
+        
+        .status.error {
+            background: #ffebee;
+            border: 1px solid #f44336;
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📷 QuickCodes WebAssembly Reader</h1>
+        
+        <div id="protocol-warning" class="status error" style="display: none;">
+            ⚠️ Para usar a câmera, acesse via HTTPS ou localhost. Protocolo atual: <span id="current-protocol"></span>
+        </div>
+        
+        <div id="status" class="status info">
+            🔄 Carregando módulo WebAssembly...
+        </div>
+        
+        <!-- Camera section -->
+        <div class="camera-container">
+            <video id="video" autoplay muted playsinline></video>
+            <canvas id="canvas"></canvas>
+        </div>
+        
+        <div class="controls">
+            <button id="startCamera" onclick="startCamera()">📹 Iniciar Câmera</button>
+            <button id="stopCamera" onclick="stopCamera()" disabled>⏹️ Parar Câmera</button>
+            <button id="captureFrame" onclick="captureFrame()" disabled>📸 Ler Código</button>
+        </div>
+        
+        <!-- File upload section -->
+        <div class="file-upload" onclick="document.getElementById('fileInput').click()" 
+             ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+            <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+            <p>📁 <strong>Upload de arquivo temporariamente desabilitado</strong></p>
+            <p>🔧 Use a captura de câmera por enquanto. Leitura de arquivo será implementada em breve.</p>
+        </div>
+        
+        <!-- Results section -->
+        <div id="results" class="results" style="display: none;">
+            <h3>📊 Resultados da Leitura</h3>
+            <div id="resultsList"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import init, { 
+            read_from_image_data, 
+            read_from_file,
+            get_supported_types 
+        } from '../pkg/web/quickcodes_wasm.js';
+
+        let wasmModule;
+        let stream;
+        let video;
+        let canvas;
+        let ctx;
+        let scanning = false;
+
+        function checkProtocol() {
+            const protocolWarning = document.getElementById('protocol-warning');
+            const currentProtocol = document.getElementById('current-protocol');
+            
+            currentProtocol.textContent = location.protocol + '//' + location.hostname;
+            
+            // Show warning if not HTTPS and not localhost
+            if (location.protocol !== 'https:' && 
+                location.hostname !== 'localhost' && 
+                location.hostname !== '127.0.0.1' && 
+                location.hostname !== '0.0.0.0') {
+                protocolWarning.style.display = 'block';
+            }
+            
+            // Also check if getUserMedia is available
+            if (!navigator.mediaDevices && !navigator.getUserMedia && !navigator.webkitGetUserMedia && !navigator.mozGetUserMedia) {
+                protocolWarning.innerHTML = '❌ Seu navegador não suporta acesso à câmera. Use Chrome, Firefox ou Safari.';
+                protocolWarning.style.display = 'block';
+            }
+        }
+
+        async function initWasm() {
+            try {
+                // Check protocol and show warning if needed
+                checkProtocol();
+                
+                wasmModule = await init();
+                console.log('✅ QuickCodes WASM module loaded successfully!');
+                
+                video = document.getElementById('video');
+                canvas = document.getElementById('canvas');
+                ctx = canvas.getContext('2d');
+                
+                updateStatus('✅ Módulo carregado! Pronto para usar.', 'success');
+                
+                // Test supported types
+                const types = get_supported_types();
+                console.log('Supported types:', types);
+                
+            } catch (error) {
+                console.error('❌ Failed to load WASM module:', error);
+                updateStatus('❌ Falha ao carregar módulo WebAssembly: ' + error.message, 'error');
+            }
+        }
+
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+
+        function showResults(results, success = true) {
+            const resultsDiv = document.getElementById('results');
+            const resultsList = document.getElementById('resultsList');
+            
+            resultsDiv.style.display = 'block';
+            resultsDiv.className = success ? 'results success' : 'results error';
+            
+            if (!success) {
+                resultsList.innerHTML = '<div class="result-item">❌ ' + results + '</div>';
+                return;
+            }
+            
+            if (Array.isArray(results)) {
+                if (results.length === 0) {
+                    resultsList.innerHTML = '<div class="result-item">🔍 Nenhum código encontrado na imagem</div>';
+                    return;
+                }
+                
+                resultsList.innerHTML = results.map((result, index) => `
+                    <div class="result-item">
+                        <div class="result-type">Código ${index + 1}: ${result.barcode_type}</div>
+                        <div class="result-data">${result.data}</div>
+                    </div>
+                `).join('');
+            } else {
+                // Single result
+                if (results.success) {
+                    resultsList.innerHTML = `
+                        <div class="result-item">
+                            <div class="result-type">Tipo: ${results.barcode_type}</div>
+                            <div class="result-data">${results.data}</div>
+                        </div>
+                    `;
+                } else {
+                    showResults(results.error || 'Erro desconhecido', false);
+                }
+            }
+        }
+
+        async function startCamera() {
+            if (!wasmModule) {
+                updateStatus('❌ Módulo WASM não carregado', 'error');
+                return;
+            }
+
+            try {
+                // Check if getUserMedia is available
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    // Try fallback for older browsers
+                    const getUserMedia = navigator.getUserMedia || 
+                                       navigator.webkitGetUserMedia || 
+                                       navigator.mozGetUserMedia || 
+                                       navigator.msGetUserMedia;
+                    
+                    if (!getUserMedia) {
+                        throw new Error('getUserMedia não é suportado neste navegador. Use Chrome, Firefox ou Safari com HTTPS.');
+                    }
+                    
+                    // Fallback implementation
+                    stream = await new Promise((resolve, reject) => {
+                        getUserMedia.call(navigator, {
+                            video: { 
+                                facingMode: 'environment',
+                                width: { ideal: 640 },
+                                height: { ideal: 480 }
+                            }
+                        }, resolve, reject);
+                    });
+                } else {
+                    // Modern API
+                    stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            facingMode: 'environment', // Prefer back camera
+                            width: { ideal: 640 },
+                            height: { ideal: 480 }
+                        } 
+                    });
+                }
+                
+                video.srcObject = stream;
+                
+                document.getElementById('startCamera').disabled = true;
+                document.getElementById('stopCamera').disabled = false;
+                document.getElementById('captureFrame').disabled = false;
+                
+                updateStatus('📹 Câmera ativa. Clique em "Ler Código" para capturar.', 'success');
+                
+            } catch (error) {
+                console.error('Camera error:', error);
+                let errorMessage = 'Erro ao acessar câmera: ' + error.message;
+                
+                if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                    errorMessage = 'Acesso à câmera negado. Permita o acesso e tente novamente.';
+                } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+                    errorMessage = 'Nenhuma câmera encontrada no dispositivo.';
+                } else if (error.name === 'NotSupportedError') {
+                    errorMessage = 'Câmera não suportada neste navegador.';
+                } else if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1' && location.hostname !== '0.0.0.0') {
+                    errorMessage = 'Acesso à câmera requer HTTPS. Tente acessar via localhost ou configure HTTPS.';
+                }
+                
+                updateStatus('❌ ' + errorMessage, 'error');
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+                video.srcObject = null;
+            }
+            
+            document.getElementById('startCamera').disabled = false;
+            document.getElementById('stopCamera').disabled = true;
+            document.getElementById('captureFrame').disabled = true;
+            
+            updateStatus('⏹️ Câmera parada.', 'info');
+        }
+
+        async function captureFrame() {
+            if (!video.videoWidth || !video.videoHeight) {
+                updateStatus('❌ Vídeo não está pronto', 'error');
+                return;
+            }
+
+            console.log('📊 Video dimensions:', video.videoWidth, 'x', video.videoHeight);
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+            
+            console.log('📊 Canvas dimensions:', canvas.width, 'x', canvas.height);
+            
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            console.log('📊 ImageData:', {
+                width: imageData.width,
+                height: imageData.height,
+                dataLength: imageData.data.length,
+                expectedLength: imageData.width * imageData.height * 4
+            });
+            
+            // Sample some pixel values for debugging
+            console.log('📊 First 20 pixel values:', Array.from(imageData.data.slice(0, 20)));
+            
+            // Check if image is mostly uniform (which could cause false positives)
+            const pixelValues = Array.from(imageData.data);
+            const uniqueValues = new Set(pixelValues);
+            const avgR = pixelValues.filter((_, i) => i % 4 === 0).reduce((a, b) => a + b, 0) / (imageData.width * imageData.height);
+            const avgG = pixelValues.filter((_, i) => i % 4 === 1).reduce((a, b) => a + b, 0) / (imageData.width * imageData.height);
+            const avgB = pixelValues.filter((_, i) => i % 4 === 2).reduce((a, b) => a + b, 0) / (imageData.width * imageData.height);
+            
+            console.log('📊 Image analysis:', {
+                uniquePixelValues: uniqueValues.size,
+                averageRGB: [Math.round(avgR), Math.round(avgG), Math.round(avgB)],
+                isLikelyUniform: uniqueValues.size < 100
+            });
+            
+            // Save a sample of the image for debugging
+            const debugCanvas = document.createElement('canvas');
+            debugCanvas.width = canvas.width;
+            debugCanvas.height = canvas.height;
+            const debugCtx = debugCanvas.getContext('2d');
+            debugCtx.putImageData(imageData, 0, 0);
+            console.log('📊 Debug image data URL (first 100 chars):', debugCanvas.toDataURL().substring(0, 100));
+            
+            try {
+                updateStatus('🔄 Lendo código...', 'info');
+                const result = read_from_image_data(imageData);
+                
+                console.log('📊 WASM result:', result);
+                
+                if (result.success) {
+                    showResults(result, true);
+                    updateStatus('✅ Código lido com sucesso!', 'success');
+                } else {
+                    showResults(result.error || 'Nenhum código encontrado', false);
+                    updateStatus('🔍 Nenhum código encontrado na imagem', 'info');
+                }
+                
+            } catch (error) {
+                console.error('❌ Read error:', error);
+                showResults('Erro na leitura: ' + error.message, false);
+                updateStatus('❌ Erro na leitura', 'error');
+            }
+        }
+
+        async function handleFileSelect(event) {
+            updateStatus('⚠️ Upload de arquivo não implementado ainda. Use a câmera.', 'info');
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            // Do nothing for now
+        }
+
+        function handleDragLeave(event) {
+            // Do nothing for now
+        }
+
+        async function handleDrop(event) {
+            event.preventDefault();
+            updateStatus('⚠️ Upload de arquivo não implementado ainda. Use a câmera.', 'info');
+        }
+
+        async function readFromFile(file) {
+            updateStatus('⚠️ Leitura de arquivo não implementada ainda no WASM', 'info');
+        }
+
+        // Make functions global for onclick handlers
+        window.startCamera = startCamera;
+        window.stopCamera = stopCamera;
+        window.captureFrame = captureFrame;
+        window.handleFileSelect = handleFileSelect;
+        window.handleDragOver = handleDragOver;
+        window.handleDragLeave = handleDragLeave;
+        window.handleDrop = handleDrop;
+
+        // Initialize when page loads
+        initWasm();
+    </script>
+</body>
+</html>

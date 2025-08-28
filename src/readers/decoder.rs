@@ -35,6 +35,11 @@ fn count_transitions(bars: &[bool]) -> usize {
 }
 
 pub(crate) fn decode_all(image: &GrayImage) -> Result<Vec<ReadResult>> {
+    // Verificação de contraste global primeiro
+    if !has_sufficient_global_contrast(image) {
+        return Ok(Vec::new());
+    }
+    
     let mut all_results = Vec::new();
     
     // Fase 1: Tentar decodificação na imagem original
@@ -770,7 +775,7 @@ fn extract_datamatrix_data(_image: &GrayImage, l_patterns: &[(u32, u32)]) -> Res
         }
     }
     
-    Ok("DATAMATRIX_CONTENT_EXTRACTED".to_string())
+    Ok(String::new()) // Retornar vazio até implementação real
 }
 
 /// Decodifica um código UPC-A
@@ -833,5 +838,164 @@ mod tests {
             assert!(!result.data.is_empty(), "Dados do resultado não podem estar vazios");
             assert!(result.confidence > 0.0, "Confiança deve ser maior que 0");
         }
+    }
+}
+
+/// Verifica se a imagem tem contraste suficiente para detecção de códigos
+fn has_sufficient_global_contrast(image: &GrayImage) -> bool {
+    let (_width, _height) = image.dimensions();
+    
+    // 1. Análise de contraste global
+    let global_contrast = calculate_global_contrast(image);
+    if global_contrast < 50 {
+        return false;
+    }
+    
+    // 2. Análise de gradientes (códigos têm bordas definidas)
+    let edge_density = calculate_edge_density(image);
+    if edge_density < 0.05 { // Menos de 5% de bordas
+        return false;
+    }
+    
+    // 3. Análise de uniformidade (rejeitar imagens muito uniformes)
+    let uniformity = calculate_uniformity(image);
+    if uniformity > 0.95 { // Mais de 95% uniforme
+        return false;
+    }
+    
+    // 4. Análise de ruído (muito ruído pode gerar falsos positivos)
+    let noise_level = calculate_noise_level(image);
+    if noise_level > 0.8 { // Muito ruído
+        return false;
+    }
+    
+    true
+}
+
+/// Calcula contraste global da imagem
+fn calculate_global_contrast(image: &GrayImage) -> u8 {
+    let (width, height) = image.dimensions();
+    let mut min_intensity = 255u8;
+    let mut max_intensity = 0u8;
+    
+    // Amostragem mais densa para melhor precisão
+    let step = 5;
+    for y in (0..height).step_by(step) {
+        for x in (0..width).step_by(step) {
+            if let Some(pixel) = image.get_pixel_checked(x, y) {
+                let intensity = pixel[0];
+                min_intensity = min_intensity.min(intensity);
+                max_intensity = max_intensity.max(intensity);
+            }
+        }
+    }
+    
+    max_intensity.saturating_sub(min_intensity)
+}
+
+/// Calcula densidade de bordas (códigos têm muitas bordas definidas)
+fn calculate_edge_density(image: &GrayImage) -> f32 {
+    let (width, height) = image.dimensions();
+    let mut edge_count = 0u32;
+    let mut total_pixels = 0u32;
+    
+    // Detector de bordas simples (Sobel)
+    for y in 1..(height-1) {
+        for x in 1..(width-1) {
+            if let (Some(center), Some(right), Some(down)) = (
+                image.get_pixel_checked(x, y),
+                image.get_pixel_checked(x+1, y),
+                image.get_pixel_checked(x, y+1)
+            ) {
+                let gx = (right[0] as i16) - (center[0] as i16);
+                let gy = (down[0] as i16) - (center[0] as i16);
+                let gradient = ((gx * gx + gy * gy) as f32).sqrt();
+                
+                if gradient > 30.0 { // Threshold para considerar uma borda
+                    edge_count += 1;
+                }
+                total_pixels += 1;
+            }
+        }
+    }
+    
+    if total_pixels > 0 {
+        edge_count as f32 / total_pixels as f32
+    } else {
+        0.0
+    }
+}
+
+/// Calcula uniformidade da imagem (0.0 = muito variada, 1.0 = uniforme)
+fn calculate_uniformity(image: &GrayImage) -> f32 {
+    let (width, height) = image.dimensions();
+    let mut histogram = [0u32; 256];
+    let mut total_pixels = 0u32;
+    
+    // Construir histograma
+    for y in 0..height {
+        for x in 0..width {
+            if let Some(pixel) = image.get_pixel_checked(x, y) {
+                histogram[pixel[0] as usize] += 1;
+                total_pixels += 1;
+            }
+        }
+    }
+    
+    if total_pixels == 0 {
+        return 1.0;
+    }
+    
+    // Calcular entropia (medida de uniformidade)
+    let mut entropy = 0.0f32;
+    for &count in &histogram {
+        if count > 0 {
+            let p = count as f32 / total_pixels as f32;
+            entropy -= p * p.log2();
+        }
+    }
+    
+    // Normalizar entropia (0 = uniforme, ~8 = máxima variação)
+    1.0 - (entropy / 8.0).min(1.0)
+}
+
+/// Calcula nível de ruído da imagem
+fn calculate_noise_level(image: &GrayImage) -> f32 {
+    let (width, height) = image.dimensions();
+    let mut noise_sum = 0.0f32;
+    let mut count = 0u32;
+    
+    // Analisar variação local (ruído causa alta variação em pequenas regiões)
+    for y in 1..(height-1) {
+        for x in 1..(width-1) {
+            if let Some(center) = image.get_pixel_checked(x, y) {
+                let mut local_variance = 0.0f32;
+                let mut neighbor_count = 0;
+                
+                // Verificar vizinhança 3x3
+                for dy in -1i32..=1 {
+                    for dx in -1i32..=1 {
+                        let nx = (x as i32 + dx) as u32;
+                        let ny = (y as i32 + dy) as u32;
+                        if let Some(neighbor) = image.get_pixel_checked(nx, ny) {
+                            let diff = (center[0] as i16 - neighbor[0] as i16).abs() as f32;
+                            local_variance += diff * diff;
+                            neighbor_count += 1;
+                        }
+                    }
+                }
+                
+                if neighbor_count > 0 {
+                    noise_sum += local_variance / neighbor_count as f32;
+                    count += 1;
+                }
+            }
+        }
+    }
+    
+    if count > 0 {
+        (noise_sum / count as f32) / (255.0 * 255.0) // Normalizar
+    } else {
+        0.0
     }
 }

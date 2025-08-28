@@ -1,0 +1,59 @@
+[package]
+name = "quickcodes-wasm"
+version = "0.1.0"
+edition = "2021"
+authors = ["Márcio Reck <marcio@fazmercado.com>"]
+description = "WebAssembly bindings for QuickCodes - Universal Barcode & QR Toolkit"
+license = "MIT"
+repository = "https://github.com/marcioreck/quickcodes"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+quickcodes = { path = "..", features = ["svg", "png", "readers"], default-features = false }
+wasm-bindgen = "0.2"
+js-sys = "0.3"
+getrandom = { version = "0.2", features = ["js"] }
+wasm-bindgen-futures = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde-wasm-bindgen = "0.6"
+image = { version = "0.25", default-features = false, features = ["png"] }
+
+# Error handling
+thiserror = "2.0"
+anyhow = "1.0"
+console_error_panic_hook = "0.1"
+
+[dependencies.web-sys]
+version = "0.3"
+features = [
+  "console",
+  "Document",
+  "Element",
+  "HtmlElement",
+  "Window",
+  "Navigator",
+  "MediaDevices",
+  "MediaStreamConstraints",
+  "MediaTrackConstraints",
+  "MediaStream",
+  "VideoTrack",
+  "ImageData",
+  "CanvasRenderingContext2d",
+  "HtmlCanvasElement",
+  "HtmlImageElement",
+  "HtmlVideoElement",
+  "File",
+  "FileReader",
+  "Blob",
+]
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
+
+[features]
+default = ["readers"]
+readers = ["quickcodes/readers"]
+
+

@@ -104,19 +104,59 @@ for i, code in enumerate(results):
 # Exportação: SVG, PNG, PDF
 ```
 
-### JavaScript (Browser) *[Planejado - WASM em desenvolvimento]*
+### JavaScript (WebAssembly) ✅
 
 ```javascript
-import { generate } from "quickcodes-wasm";
+// Browser usage
+import init, { generate_svg, generate, read_from_image_data } from "./pkg/web/quickcodes_wasm.js";
 
-// Gerar um EAN-13
-let svg = generate("EAN13", "7891234567890");
+await init(); // Initialize WASM module
+
+// Gerar QR Code como SVG
+const qr = generate_svg("QRCode", "https://github.com/marcioreck/quickcodes");
+if (qr.success) {
+    document.body.innerHTML = qr.data;
+}
+
+// Gerar EAN-13 como PNG (base64)
+const ean = generate("EAN13", "7891234567890", "PNG");
+if (ean.success) {
+    const img = document.createElement('img');
+    img.src = `data:image/png;base64,${ean.data}`;
+    document.body.appendChild(img);
+}
+
+// Ler código de câmera/canvas
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+const result = read_from_image_data(imageData);
+if (result.success) {
+    console.log(`Found: ${result.barcode_type} = ${result.data}`);
+}
+```
+
+### Node.js (WebAssembly)
+
+```javascript
+import * as wasm from './pkg/nodejs/quickcodes_wasm.js';
+import fs from 'fs';
+
+// Gerar QR Code como SVG
+const qr = wasm.generate_svg('QRCode', 'https://example.com');
+if (qr.success) {
+    fs.writeFileSync('qr.svg', qr.data);
+}
 
 // Gerar DataMatrix para farmácia
-let datamatrix = generate("DataMatrix", "010123456789012815240101");
+const dm = wasm.generate_svg('DataMatrix', '010123456789012815240101');
+if (dm.success) {
+    fs.writeFileSync('pharma.svg', dm.data);
+}
 
-// Gerar PDF417 para documentos
-let pdf417 = generate("PDF417", "DRIVER LICENSE|DOE,JOHN|1990-01-01");
+// Listar formatos suportados
+console.log('Types:', wasm.get_supported_types());
+console.log('Formats:', wasm.get_supported_formats());
 
 // Gerar Aztec para tickets
 let aztec = generate("Aztec", "TKT:12345|FROM:NYC|TO:BOS|DATE:2025-08-21");
@@ -296,8 +336,14 @@ make                               # Compila os testes
   * [x] Canvas/HTML5 integration
   * [x] Batch processing
 
-### 🚀 **Fase 4 - Ferramentas e Otimização** [PRÓXIMA FASE]
-* [ ] **WebAssembly**
+### 🚀 **Fase 4 - WebAssembly** [✅ CONCLUÍDA]
+* [x] **WebAssembly**
+  * [x] Build WASM otimizado para browser e Node.js
+  * [x] Bindings JavaScript com wasm-bindgen
+  * [x] Exemplos HTML interativos (geração e leitura)
+  * [x] Suporte para múltiplos formatos de exportação (SVG, PNG)
+  * [x] API unificada para browser e Node.js
+  * [x] Documentação completa com exemplos práticos
   * [ ] Build WASM otimizado
   * [ ] API JavaScript para browser
   * [ ] JavaScript/Node.js bindings (NAPI-RS ou WASM)
@@ -559,14 +605,20 @@ cargo run --example test_reader --features readers path/para/sua/imagem.png
 - ✅ Pipeline integrado no decoder
 - ✅ Testes extensivos validados
 
-#### 📋 Avaliação NAPI-RS (JavaScript/Node.js)
-**🎯 Decisão Estratégica: POSTERGAR para Fase 4**
+#### 📋 Status dos Bindings de Linguagem
 
-**Motivos para adiamento:**
-- ✅ **4 linguagens já cobertas** eficientemente (Python, Go, .NET, C++)
-- 🎯 **WebAssembly tem prioridade** (solução mais universal para browser + Node.js)
-- ⚠️ **Complexidade técnica atual** do setup NAPI-RS
-- 📈 **Melhor ROI** focando em ferramentas CLI e API REST
+**✅ Implementados e Testados:**
+- ✅ **Rust**: Biblioteca nativa principal
+- ✅ **Python**: PyO3 bindings com todas as features
+- ✅ **Go**: Bindings CGO funcionais
+- ✅ **C++**: Exemplo funcional via headers C API
+- ✅ **.NET**: Bindings C# com P/Invoke testados
+- ✅ **JavaScript/WebAssembly**: Implementação completa para browser e Node.js
+
+**🔄 Planejados para Futuro:**
+- ⏳ **JavaScript**: NAPI-RS alternativo (postergado - WASM tem prioridade)
+- ⏳ **Java**: JNI bindings
+- ⏳ **Swift**: iOS/macOS bindings
 
 ### 🎯 Status Final das 3 Fases
 

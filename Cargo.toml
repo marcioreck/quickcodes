@@ -77,3 +77,11 @@ imageproc = "0.23"
 name = "generate_test_sheet"
 path = "examples/generate_test_sheet.rs"
 required-features = ["svg", "pdf"]
+
+[workspace]
+members = ["wasm"]
+
+# Optimized WASM builds
+[profile.release]
+opt-level = "s"
+lto = true

@@ -1,0 +1,26 @@
+{
+  "name": "@quickcodes/wasm-example",
+  "version": "0.1.0",
+  "description": "Example usage of QuickCodes WebAssembly module in Node.js",
+  "main": "nodejs_example.js",
+  "type": "module",
+  "scripts": {
+    "start": "node nodejs_example.js",
+    "test": "node nodejs_example.js"
+  },
+  "keywords": [
+    "barcode",
+    "qrcode",
+    "wasm",
+    "webassembly",
+    "nodejs",
+    "quickcodes"
+  ],
+  "author": "Márcio Reck <marcio@fazmercado.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
