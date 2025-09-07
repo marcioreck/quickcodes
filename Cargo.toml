@@ -38,7 +38,7 @@ svg = "0.18"
 printpdf = { version = "0.7", features = ["embedded_images"], optional = true }
 
 # Image reading and processing (for barcode detection)
-rqrr = { version = "0.7", optional = true }  # QR code reader
+rqrr = { version = "0.10", optional = true }  # QR code reader
 bardecoder = { version = "0.5", optional = true }  # Universal barcode decoder
 rxing = { version = "0.5", optional = true }  # Rust port of ZXing library
 
