@@ -23,7 +23,7 @@ anyhow = "1.0"
 
 # Image processing and generation
 image = { version = "0.24", optional = true }
-imageproc = { version = "0.23", optional = true }
+imageproc = { version = "0.25", optional = true }
 resvg = { version = "0.44", optional = true }
 usvg = { version = "0.44", optional = true }
 tiny-skia = { version = "0.11", optional = true }
@@ -74,7 +74,7 @@ resvg = "0.44"
 usvg = "0.44"
 tiny-skia = "0.11"
 image = "0.24"
-imageproc = "0.23"
+imageproc = "0.25"
 
 [[example]]
 name = "generate_test_sheet"
