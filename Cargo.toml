@@ -22,7 +22,7 @@ thiserror = "2.0"
 anyhow = "1.0"
 
 # Image processing and generation
-image = { version = "0.24", optional = true }
+image = { version = "0.25", optional = true }
 imageproc = { version = "0.23", optional = true }
 resvg = { version = "0.44", optional = true }
 usvg = { version = "0.44", optional = true }
@@ -73,7 +73,7 @@ printpdf = { version = "0.7", features = ["embedded_images"] }
 resvg = "0.44"
 usvg = "0.44"
 tiny-skia = "0.11"
-image = "0.24"
+image = "0.25"
 imageproc = "0.23"
 
 [[example]]
